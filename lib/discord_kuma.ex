@@ -1,12 +1,12 @@
 defmodule DiscordKuma do
   use Application
-  use Supervisor
 
   def start(_type, _args) do
-    require Logger
-    Logger.log :info, "Starting bot supervisors."
-    children = [supervisor(DiscordKuma.Bot, [[name: DiscordKuma.Bot]])]
+    import Supervisor.Spec, warn: false
 
-    {:ok, _pid} = Supervisor.start_link(children, strategy: :one_for_one)
+    children = [worker(DiscordKuma.Bot, [], restart: :permanent)]
+    opts = [strategy: :one_for_one, name: DiscordKuma.Supervisor]
+
+    Supervisor.start_link(children, opts)
   end
 end
