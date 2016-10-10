@@ -39,28 +39,28 @@ defmodule DiscordKuma.Module do
   defmacro command(list, do: func) when is_list(list) do
     for word <- list do
       quote do
-        if var!(command) == unquote(word), do: unquote(func)
+        if var!(command) == unquote(word), do: Task.async(fn -> unquote(func) end)
       end
     end
   end
 
   defmacro command(word, do: func) do
     quote do
-      if var!(command) == unquote(word), do: unquote(func)
+      if var!(command) == unquote(word), do: Task.async(fn -> unquote(func) end)
     end
   end
 
   defmacro match(list, do: func) when is_list(list) do
     for word <- list do
       quote do
-        if var!(text) == unquote(word), do: unquote(func)
+        if var!(text) == unquote(word), do: Task.async(fn -> unquote(func) end)
       end
     end
   end
 
   defmacro match(word, do: func) do
     quote do
-      if var!(text) == unquote(word), do: unquote(func)
+      if var!(text) == unquote(word), do: Task.async(fn -> unquote(func) end)
     end
   end
 
