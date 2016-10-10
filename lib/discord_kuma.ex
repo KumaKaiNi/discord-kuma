@@ -1,14 +1,12 @@
 defmodule DiscordKuma do
+  use Application
+  use Supervisor
   require Logger
 
   def start(_type, _args) do
-    Logger.debug "Starting HTTPoison..."
-    HTTPoison.start
+    Logger.info "Starting supervisor..."
 
-    Logger.debug "Starting bot..."
-    DiscordEx.Client.start_link(%{
-      token: Application.get_env(:discord_kuma, :discord_token),
-      handler: DiscordKuma.Module
-    })
+    children = [supervisor(DiscordKuma.Bot, [[name: DiscordKuma.Bot]])]
+    {:ok, _pid} = Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
