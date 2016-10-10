@@ -16,7 +16,7 @@ defmodule DiscordKuma.Handler do
       <> "!say - repeats what you say.\n"
       <> "!dan - returns a random recent image using a two tags.\n"
       <> "!safe - returns a random recent image using a one tag and rating:safe.\n"
-      <> "!lewd - returns a random recent image using a one tag and rating:questionable or rating:explicit.\n"
+      <> "!lewd - returns a random recent image using a one tag and -rating:safe.\n"
       <> "!smug - sends a smug anime girl.\n"
       <> "```\n"
       <> "\n"
