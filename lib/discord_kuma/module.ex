@@ -12,10 +12,10 @@ defmodule DiscordKuma.Module do
     quote do
       def handle_event({:message_create, var!(payload)}, var!(state)) do
         var!(msg) = var!(payload).data
-        text = var!(msg)["content"]
+        var!(text) = var!(msg)["content"]
 
-        var!(command) = text |> String.split |> List.first
-        var!(message) = text |> String.split |> List.delete(var!(command)) |> Enum.join(" ")
+        [var!(command) | var!(message_split)] = var!(text) |> String.split
+        var!(message) = Enum.join(var!(message_split), " ")
 
         unquote(body)
 
@@ -50,9 +50,29 @@ defmodule DiscordKuma.Module do
     end
   end
 
+  defmacro match(list, do: func) when is_list(list) do
+    for word <- list do
+      quote do
+        if var!(text) == unquote(word), do: unquote(func)
+      end
+    end
+  end
+
+  defmacro match(word, do: func) do
+    quote do
+      if var!(text) == unquote(word), do: unquote(func)
+    end
+  end
+
   defmacro reply(text) do
     quote do
       Channel.send_message(var!(state)[:rest_client], var!(msg)["channel_id"], %{content: unquote(text)})
+    end
+  end
+
+  defmacro reply_file(filepath, text \\ "") do
+    quote do
+      Channel.send_file(var!(state)[:rest_client], var!(msg)["channel_id"], %{file: unquote(filepath), content: unquote(text)})
     end
   end
 end
