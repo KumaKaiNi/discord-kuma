@@ -18,4 +18,4 @@ erl_crash.dump
 
 secret.exs
 *.dets
-/_db
+/_tmp
