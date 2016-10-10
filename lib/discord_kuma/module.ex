@@ -1,11 +1,8 @@
 defmodule DiscordKuma.Module do
-  def handle_event({:message_create, payload}, state) do
-    IO.puts "[:message_create] #{payload}"
-    {:ok, state}
-  end
+  require Logger
 
-  def handle_event({event, _payload}, state) do
-    IO.puts "[#{event}]"
+  def handle_event({event, payload}, state) do
+    Logger.info "[#{event}]"
     {:ok, state}
   end
 end

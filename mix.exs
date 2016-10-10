@@ -14,7 +14,9 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:discord_ex, :logger]]
+    [applications: [:discord_ex, :logger, :httpoison],
+     mod: {DiscordKuma, []}
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -27,6 +29,6 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:discord_ex, "~> 1.1.8"}]
+    [{:discord_ex, git: "https://github.com/rmcafee/discord_ex", tag: "master"}]
   end
 end

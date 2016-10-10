@@ -1,7 +1,7 @@
 %{"certifi": {:hex, :certifi, "0.4.0", "a7966efb868b179023618d29a407548f70c52466bf1849b9e8ebd0e34b7ea11f", [:rebar3], []},
   "chacha20": {:hex, :chacha20, "0.3.4", "9359a5effa0db0e204e8ce7711d209e2f75b2b72fbe8d2a9ad0dd4c069b124f6", [:mix], []},
   "curve25519": {:hex, :curve25519, "0.1.2", "47cece8f9402bd78fb52720978793eb5ee657f9be91effe6fe25beae812d8fdd", [:mix], []},
-  "discord_ex": {:hex, :discord_ex, "1.1.8", "e36b166b7e6cdc779b914e4b0d7038f811bffc2ccf827e1ab584cc26f590cc0f", [:mix], [{:dns, "~> 0.0.3", [hex: :dns, optional: false]}, {:httpoison, "~> 0.9.0", [hex: :httpoison, optional: false]}, {:kcl, "~> 0.6.3", [hex: :kcl, optional: false]}, {:poison, "~> 2.0", [hex: :poison, optional: false]}, {:poly1305, "~> 0.4.2", [hex: :poly1305, optional: false]}, {:porcelain, "~> 2.0.1", [hex: :porcelain, optional: false]}, {:socket, "~> 0.3.5", [hex: :socket, optional: false]}, {:temp, "~> 0.4", [hex: :temp, optional: false]}, {:websocket_client, "~> 1.1.0", [hex: :websocket_client, optional: false]}]},
+  "discord_ex": {:git, "https://github.com/rmcafee/discord_ex", "991ffaabbb04083a6b9ff06bc78021e250c40b32", [tag: "master"]},
   "dns": {:hex, :dns, "0.0.4", "2e347a0a03e8345bc70c6d69ed08788103a3bec81b93e4636b1b432110835436", [:mix], [{:socket, "~> 0.3.5", [hex: :socket, optional: false]}]},
   "ed25519": {:hex, :ed25519, "0.2.3", "df7c7a9057c9e503bdbd0a881841fe4650371ad032f84eb5e2710df9f2a4169e", [:mix], []},
   "equivalex": {:hex, :equivalex, "0.1.2", "4ee29ebe6fa820f57277bf7126c92ba0eb7576714cfe280d28e6fab5473fd40e", [:mix], []},
