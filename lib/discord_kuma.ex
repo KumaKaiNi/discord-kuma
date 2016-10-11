@@ -4,6 +4,7 @@ defmodule DiscordKuma do
   require Logger
 
   unless File.exists?("_tmp"), do: File.mkdir("_tmp")
+  unless File.exists?("_db"), do: File.mkdir("_db")
 
   def start(_type, _args) do
     Logger.info "Starting supervisor..."
