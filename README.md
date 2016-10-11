@@ -5,4 +5,5 @@
 ## Initial setup
 
 `!addrole <role>` - Adds a role that is allowed to change these settings.
+
 `!setlog <channel>` - Sets the log channel for joins and parts and such.
