@@ -4,6 +4,8 @@
 
 ## Initial setup
 
-`!addrole <role>` - Adds a role that is allowed to change these settings.
+1. `!setup` - Initiates your server and provides instructions.
+2. `!addrole <role>` - Adds a role that is allowed to change these settings.
+3. `!setlog <channel>` - Sets the log channel for joins and parts and such.
 
-`!setlog <channel>` - Sets the log channel for joins and parts and such.
+All done, have fun!
