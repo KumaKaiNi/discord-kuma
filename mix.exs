@@ -3,8 +3,8 @@ defmodule DiscordKuma.Mixfile do
 
   def project do
     [app: :discord_kuma,
-     version: "0.1.0",
-     elixir: "~> 1.3",
+     version: "0.2.0",
+     elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -14,7 +14,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:discord_ex, :logger, :httpoison],
+    [applications: [:nostrum, :logger, :httpoison],
      mod: {DiscordKuma, []}
     ]
   end
@@ -29,6 +29,6 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:discord_ex, git: "https://github.com/rmcafee/discord_ex", tag: "master"}]
+    [{:nostrum, "~> 0.1"}]
   end
 end
