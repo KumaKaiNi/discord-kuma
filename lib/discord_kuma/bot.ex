@@ -146,21 +146,5 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  handle :GUILD_BAN_ADD do
-    log "**#{msg.user.username}** has been banned."
-  end
-
-  handle :GUILD_BAN_REMOVE do
-    log "**#{msg.user.username}** has been unbanned."
-  end
-
-  handle :GUILD_MEMBER_ADD do
-    log "**#{msg.user.username}** has joined the server."
-  end
-
-  handle :GUILD_MEMBER_REMOVE do
-    log "**#{msg.user.username}** has left the server."
-  end
-
-  def handle_event({_event, {_msg}, _ws_state}, state), do: {:ok, state}
+  handle _event, do: nil
 end
