@@ -29,6 +29,6 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:nostrum, "~> 0.1"}]
+    [{:nostrum, "~> 0.2.1"}]
   end
 end
