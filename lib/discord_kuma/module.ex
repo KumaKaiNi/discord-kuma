@@ -8,7 +8,7 @@ defmodule DiscordKuma.Module do
       use Nostrum.Consumer
       alias Nostrum.Api
 
-      def start_link, do: Consumer.start_link(__MODULE__)
+      def start_link, do: Consumer.start_link(__MODULE__, :state)
     end
   end
 
