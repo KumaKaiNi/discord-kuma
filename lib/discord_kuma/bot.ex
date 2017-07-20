@@ -153,6 +153,7 @@ defmodule DiscordKuma.Bot do
 
   def del_custom_command(msg) do
     [_ | command] = msg.content
+    action = query_data(:commands, "!#{command}")
 
     case action do
       nil -> reply "Command does not exist."
