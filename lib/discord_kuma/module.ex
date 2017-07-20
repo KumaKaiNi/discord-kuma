@@ -55,16 +55,22 @@ defmodule DiscordKuma.Module do
 
   defp make_match(text, body) when is_atom(body) do
     quote do
-      if var!(msg).content |> String.split |> List.first == unquote(text) do
-        unquote(body)(var!(msg))
+      cond do
+        var!(msg).content == unquote(text) -> unquote(body)(var!(msg))
+        var!(msg).content |> String.split |> List.first == unquote(text) ->
+          unquote(body)(var!(msg))
+        true -> nil
       end
     end
   end
 
   defp make_match(text, body) do
     quote do
-      if var!(msg).content |> String.split |> List.first == unquote(text) do
-        unquote(body)
+      cond do
+        var!(msg).content == unquote(text) -> unquote(body)
+        var!(msg).content |> String.split |> List.first == unquote(text) ->
+          unquote(body)
+        true -> nil
       end
     end
   end
