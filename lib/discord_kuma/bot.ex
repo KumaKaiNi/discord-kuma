@@ -147,5 +147,8 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  handle event, do: Logger.info "[event] :#{event}"
+  handle event do
+    Logger.info "[event] :#{event}"
+    IO.inspect msg
+  end
 end
