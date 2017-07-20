@@ -32,6 +32,10 @@ defmodule DiscordKuma.Bot do
   end
 
   # Event handlers
+  handle :GUILD_CREATE do
+    IO.inspect msg
+  end
+
   handle :MESSAGE_CREATE do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
