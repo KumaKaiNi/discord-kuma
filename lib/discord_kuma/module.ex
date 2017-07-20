@@ -22,23 +22,29 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro enforce(do: body) do
+  defmacro enforce(validator, do: body) do
     quote do
-      var!(guild_id) = Nostrum.Api.get_channel!(var!(msg).channel_id)["guild_id"]
-      var!(user_id) = var!(msg).author.id
-      {:ok, member} = Nostrum.Api.get_member(var!(guild_id), var!(user_id))
-
-      var!(db) = query_data("guilds", var!(guild_id))
-
-      admin = cond do
-        var!(db) == nil -> true
-        var!(db).admin_roles == [] -> true
-        true -> Enum.member?(for role <- member["roles"] do
-          Enum.member?(var!(db).admin_roles, role)
-        end, true)
+      if unquote(validator)(var!(msg)) do
+        unquote(body)
       end
+    end
+  end
 
-      if admin, do: unquote(body)
+  defmacro match(text, do: body) when is_bitstring(text) do
+    make_match(text, body)
+  end
+
+  defmacro match([texts], do: body) do
+    for text <- texts do
+      make_match(text, body)
+    end
+  end
+
+  def make_match(text, body) do
+    quote do
+      if var!(msg).content |> String.split |> List.first == unquote(text) do
+        unquote(body)
+      end
     end
   end
 
