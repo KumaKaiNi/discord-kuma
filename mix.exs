@@ -29,6 +29,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:nostrum, git: "https://github.com/Kraigie/nostrum.git"}]
+    [{:ex_rated, "~> 1.2"},
+     {:nostrum, git: "https://github.com/Kraigie/nostrum.git"}]
   end
 end

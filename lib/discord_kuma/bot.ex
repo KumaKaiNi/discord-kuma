@@ -19,8 +19,21 @@ defmodule DiscordKuma.Bot do
     end
   end
 
+  def rate_limit(msg) do
+    command = msg.content |> String.split |> List.first
+    {rate, _} = ExRated.check_rate(command, 10_000, 1)
+
+    case rate do
+      :ok    -> true
+      :error -> false
+    end
+  end
+
   handle :MESSAGE_CREATE do
-    match "!help", :help
+    enforce :rate_limit do
+      match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
+    end
+
     match ["hello", "hi", "hey", "sup"], :hello
 
     enforce :admin do
