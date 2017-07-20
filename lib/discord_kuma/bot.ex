@@ -1,6 +1,7 @@
 defmodule DiscordKuma.Bot do
   use DiscordKuma.Module
   import DiscordKuma.Util
+  require Logger
 
   handle :MESSAGE_CREATE do
     command = msg.content |> String.split |> List.first
@@ -146,5 +147,5 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  handle _event, do: nil
+  handle event, do: Logger.info "[event] :#{event}"
 end
