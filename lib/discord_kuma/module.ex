@@ -50,6 +50,9 @@ defmodule DiscordKuma.Module do
     end
   end
 
+  defmacro match_all(body), do: make_match(body)
+  defmacro match_all(do: body), do: make_match(body)
+
   defp make_match(text, body) when is_atom(body) do
     quote do
       if var!(msg).content |> String.split |> List.first == unquote(text) do
@@ -63,6 +66,12 @@ defmodule DiscordKuma.Module do
       if var!(msg).content |> String.split |> List.first == unquote(text) do
         unquote(body)
       end
+    end
+  end
+
+  defp make_match(body) do
+    quote do
+      unquote(body)
     end
   end
 
