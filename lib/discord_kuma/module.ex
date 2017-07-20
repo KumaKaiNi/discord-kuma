@@ -34,8 +34,10 @@ defmodule DiscordKuma.Module do
     make_match(text, body)
   end
 
-  defmacro match([texts], do: body) do
-    for text <- texts do
+  defmacro match([primary_text | alias_texts], do: body) do
+    make_match(primary_text)
+
+    for text <- alias_texts do
       make_match(text, body)
     end
   end
