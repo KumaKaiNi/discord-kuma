@@ -69,7 +69,7 @@ defmodule DiscordKuma.Bot do
         case quote_id |> Integer.parse do
           {quote_id, _} ->
             case query_data(:quotes, quote_id) do
-              nil -> {"", "Quote does not exist. - KumaKaiNi, 2017"}
+              nil -> {"65535", "Quote does not exist. - KumaKaiNi, 2017"}
               quote_text -> {quote_id, quote_text}
             end
           :error ->
@@ -78,7 +78,7 @@ defmodule DiscordKuma.Bot do
         end
     end
 
-    reply "**[\##{quote_id}]** #{quote_text}"
+    reply "`[\##{quote_id}]` #{quote_text}"
   end
 
   def custom_command(msg) do
