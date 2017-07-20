@@ -87,6 +87,7 @@ defmodule DiscordKuma.Bot do
   end
 
   def setup(msg) do
+    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
     db = query_data("guilds", guild_id)
 
     cond do
@@ -99,6 +100,7 @@ defmodule DiscordKuma.Bot do
   end
 
   def add_role(msg) do
+    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
     db = query_data("guilds", guild_id)
     role_ids = msg.mention_roles
 
@@ -119,6 +121,7 @@ defmodule DiscordKuma.Bot do
   end
 
   def del_role(msg) do
+    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
     role_ids = msg.mention_roles
     db = query_data("guilds", guild_id)
 
