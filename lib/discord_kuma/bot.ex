@@ -150,10 +150,11 @@ defmodule DiscordKuma.Bot do
   handle :TYPING_START, do: nil
 
   handle :PRESENCE_UPDATE do
-    IO.inspect msg
     if msg.game do
-      if msg.game.type == 1 do
-        Logger.warn "[stream] #{msg.game.name} @ #{msg.game.url}"
+      if Map.has_key?(msg.game, :type) do
+        if msg.game.type == 1 do
+          Logger.warn "[stream] #{msg.game.name} @ #{msg.game.url}"
+        end
       end
     end
   end
