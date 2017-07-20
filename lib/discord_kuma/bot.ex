@@ -149,7 +149,7 @@ defmodule DiscordKuma.Bot do
 
   handle :TYPING_START, do: nil
 
-  handle :PRESENCE_UPDATE, do
+  handle :PRESENCE_UPDATE do
     IO.inspect msg
     # Logger.info "[presence] #{msg.game.name}"
   end
