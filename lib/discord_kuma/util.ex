@@ -78,6 +78,21 @@ defmodule DiscordKuma.Util do
     response
   end
 
+  def query_all_data(table) do
+    file = '/var/www/_db/#{table}.dets'
+    {:ok, _} = :dets.open_file(table, [file: file, type: :set])
+    result = :dets.match_object(table, {:"$1", :"$2"})
+
+    response =
+      case result do
+        [] -> nil
+        values -> values
+      end
+
+    :dets.close(table)
+    response
+  end
+
   def delete_data(table, key) do
     file = '/var/www/_db/#{table}.dets'
     {:ok, _} = :dets.open_file(table, [file: file, type: :set])
