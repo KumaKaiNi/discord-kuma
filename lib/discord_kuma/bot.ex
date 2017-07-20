@@ -151,11 +151,13 @@ defmodule DiscordKuma.Bot do
 
   handle :PRESENCE_UPDATE do
     IO.inspect msg
-    # Logger.info "[presence] #{msg.game.name}"
+    if msg.game do
+      if msg.game.url, do: Logger.warn "[stream] #{msg.game.name} @ #{msg.game.url}"
+    end
   end
 
   handle event do
-    Logger.info "[event] :#{event}"
+    Logger.warn "[event] :#{event}"
     IO.inspect msg
   end
 end
