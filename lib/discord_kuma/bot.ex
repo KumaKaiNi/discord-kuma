@@ -147,6 +147,9 @@ defmodule DiscordKuma.Bot do
     end
   end
 
+  handle :TYPING_START, do: nil
+  handle :PRESENCE_UPDATE, do: Logger.info "[presence] #{msg.game.name}"
+
   handle event do
     Logger.info "[event] :#{event}"
     IO.inspect msg
