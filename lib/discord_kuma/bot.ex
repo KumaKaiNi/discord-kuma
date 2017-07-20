@@ -20,16 +20,19 @@ defmodule DiscordKuma.Bot do
   end
 
   handle :MESSAGE_CREATE do
-    match ["hello", "hi", "hey", "sup"] do
-      replies = ["sup loser", "yo", "ay", "hi", "wassup"]
-
-      if one_to(25) do
-        reply Enum.random(replies)
-      end
-    end
+    match "!hi", :hello
+    match ["hello", "hi", "hey", "sup"], :hello
 
     enforce :admin do
       match "!kuma", do: reply "Kuma~!"
+    end
+  end
+
+  def hello(msg) do
+    replies = ["sup loser", "yo", "ay", "hi", "wassup"]
+
+    if one_to(25) do
+      reply Enum.random(replies)
     end
   end
 

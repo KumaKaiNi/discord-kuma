@@ -30,15 +30,31 @@ defmodule DiscordKuma.Module do
     end
   end
 
+  defmacro match(text, body) when is_bitstring(text) do
+    make_match(text, body)
+  end
+
+  defmacro match(texts, body) when is_list(texts) do
+    for text <- texts do
+      make_match(text, body)
+    end
+  end
+
   defmacro match(text, do: body) when is_bitstring(text) do
     make_match(text, body)
   end
 
-  defmacro match([primary_text | alias_texts], do: body) do
-    make_match(primary_text, body)
-
-    for text <- alias_texts do
+  defmacro match(texts, do: body) when is_list(texts) do
+    for text <- texts do
       make_match(text, body)
+    end
+  end
+
+  defp make_match(text, body) when is_atom(body) do
+    quote do
+      if var!(msg).content |> String.split |> List.first == unquote(text) do
+        unquote(body)(var!(msg))
+      end
     end
   end
 
