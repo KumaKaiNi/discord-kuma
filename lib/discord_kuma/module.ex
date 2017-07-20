@@ -35,14 +35,14 @@ defmodule DiscordKuma.Module do
   end
 
   defmacro match([primary_text | alias_texts], do: body) do
-    make_match(primary_text)
+    make_match(primary_text, body)
 
     for text <- alias_texts do
       make_match(text, body)
     end
   end
 
-  def make_match(text, body) do
+  defp make_match(text, body) do
     quote do
       if var!(msg).content |> String.split |> List.first == unquote(text) do
         unquote(body)
