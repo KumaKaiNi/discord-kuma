@@ -35,9 +35,16 @@ defmodule DiscordKuma.Bot do
   handle :MESSAGE_CREATE do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
+      match "!uptime", :uptime
+      match "!time", :local_time
+      match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
+      match "!predict", :prediction
+      match "!smug", :smug
+      match "!np", :lastfm_np
+      match "!guidance", :souls_message
       match "!quote", :get_quote
-      match_all :custom_command
       match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
+      match_all :custom_command
     end
 
     match ["hello", "hi", "hey", "sup"], :hello
@@ -57,7 +64,93 @@ defmodule DiscordKuma.Bot do
   handle _event, do: nil
 
   # Rate limited user commands
-  def help(msg), do: reply "ok"
+  def help(msg), do: reply "https://github.com/KumaKaiNi/discord-kuma"
+
+  def uptime(msg) do
+    url = "https://decapi.me/twitch/uptime?channel=rekyuus"
+    request =  HTTPoison.get! url
+
+    case request.body do
+      "Channel is not live." -> reply "Stream is not online!"
+      time -> reply "Stream has been live for #{time}."
+    end
+  end
+
+  def local_time(msg) do
+    {{_, _, _}, {hour, minute, _}} = :calendar.local_time
+
+    h = cond do
+      hour <= 9 -> "0#{hour}"
+      true      -> "#{hour}"
+    end
+
+    m = cond do
+      minute <= 9 -> "0#{minute}"
+      true        -> "#{minute}"
+    end
+
+    reply "It is #{h}:#{m} MST rekyuu's time."
+  end
+
+  def prediction(msg) do
+    predictions = [
+      "It is certain.",
+      "It is decidedly so.",
+      "Without a doubt.",
+      "Yes, definitely.",
+      "You may rely on it.",
+      "As I see it, yes.",
+      "Most likely.",
+      "Outlook good.",
+      "Yes.",
+      "Signs point to yes.",
+      "Reply hazy, try again.",
+      "Ask again later.",
+      "Better not tell you now.",
+      "Cannot predict now.",
+      "Concentrate and ask again.",
+      "Don't count on it.",
+      "My reply is no.",
+      "My sources say no.",
+      "Outlook not so good.",
+      "Very doubtful."
+    ]
+
+    reply Enum.random(predictions)
+  end
+
+  def smug(msg) do
+    url = "https://api.imgur.com/3/album/zSNC1"
+    auth = %{"Authorization" => "Client-ID #{Application.get_env(:twitch_kuma, :imgur_client_id)}"}
+
+    request = HTTPoison.get!(url, auth)
+    response = Poison.Parser.parse!((request.body), keys: :atoms)
+    result = response.data.images |> Enum.random
+
+    reply result.link
+  end
+
+  def lastfm_np(msg) do
+    timeframe = :os.system_time(:seconds) - 180
+    url = "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rekyuu&api_key=#{Application.get_env(:twitch_kuma, :lastfm_key)}&format=json&limit=1&from=#{timeframe}"
+
+    request = HTTPoison.get!(url)
+    response = Poison.Parser.parse!((request.body), keys: :atoms)
+    track = response.recenttracks.track
+
+    case List.first(track) do
+      nil -> nil
+      song -> reply "#{song.artist.'#text'} - #{song.name} [#{song.album.'#text'}]"
+    end
+  end
+
+  def souls_message(msg) do
+    url = "http://souls.riichi.me/api"
+    request = HTTPoison.get!(url)
+    response = Poison.Parser.parse!((request.body), keys: :atoms)
+
+    reply "#{response.message}"
+  end
 
   def get_quote(msg) do
     {quote_id, quote_text} = case length(msg.content |> String.split) do
