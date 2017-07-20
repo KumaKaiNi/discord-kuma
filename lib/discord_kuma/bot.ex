@@ -140,7 +140,7 @@ defmodule DiscordKuma.Bot do
           admin_roles ->
             db = Map.put(db, :admin_roles, admin_roles ++ role_ids |> Enum.uniq)
             store_data("guilds", guild_id, db)
-            reply "Added #{role_ids |> Enum.join(', ')} as administrative roles!"
+            reply "Added administrative roles!"
         end
     end
   end
@@ -158,7 +158,7 @@ defmodule DiscordKuma.Bot do
           admin_roles ->
             db = Map.put(db, :admin_roles, admin_roles -- role_ids |> Enum.uniq)
             store_data("guilds", guild_id, db)
-            reply "Removed #{role_ids |> Enum.join(', ')} from administrative roles."
+            reply "Removed administrative roles."
         end
     end
   end
