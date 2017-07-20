@@ -34,7 +34,7 @@ defmodule DiscordKuma.Bot do
   handle :MESSAGE_CREATE do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
-      match_all, :custom_command
+      match_all :custom_command
       match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
     end
 
@@ -65,7 +65,6 @@ defmodule DiscordKuma.Bot do
       action -> reply action
     end
   end
-
 
   def ty_kuma(msg) do
     replies = ["np", "don't mention it", "anytime", "sure thing", "ye whateva"]
