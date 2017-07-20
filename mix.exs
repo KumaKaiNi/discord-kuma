@@ -14,7 +14,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:nostrum, :logger, :httpoison],
+    [applications: [:ex_rated, :nostrum, :logger, :httpoison],
      mod: {DiscordKuma, []}
     ]
   end
