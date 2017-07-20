@@ -42,9 +42,9 @@ defmodule DiscordKuma.Bot do
 
     enforce :admin do
       match "!kuma", :kuma
-      match "!setup", do: setup(msg, db)
-      match "!addrole", do: add_role(msg, db)
-      match "!delrole", do: del_role(msg, db)
+      match "!setup", :setup
+      match "!addrole", :add_role
+      match "!delrole", :del_role
       match "!add", :add_custom_command
       match "!del", :del_custom_command
       # match "!addquote", :add_quote
@@ -86,7 +86,9 @@ defmodule DiscordKuma.Bot do
     reply "Kuma~!"
   end
 
-  def setup(msg, db) do
+  def setup(msg) do
+    db = query_data("guilds", guild_id)
+
     cond do
       db == nil ->
         store_data("guilds", guild_id, %{admin_roles: []})
@@ -96,7 +98,8 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  def add_role(msg, db) do
+  def add_role(msg) do
+    db = query_data("guilds", guild_id)
     role_ids = msg.mention_roles
 
     case role_ids do
@@ -115,8 +118,9 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  def del_role(msg, db) do
+  def del_role(msg) do
     role_ids = msg.mention_roles
+    db = query_data("guilds", guild_id)
 
     case role_ids do
       [] -> reply "You didn't specify any roles."
