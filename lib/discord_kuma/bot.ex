@@ -139,7 +139,7 @@ defmodule DiscordKuma.Bot do
   end
 
   def add_custom_command(msg) do
-    [_ | [command | action]] = msg.content
+    [_ | [command | action]] = msg.content |> String.split
     action = action |> Enum.join(" ")
 
     exists = query_data(:commands, "!#{command}")
@@ -152,7 +152,7 @@ defmodule DiscordKuma.Bot do
   end
 
   def del_custom_command(msg) do
-    [_ | command] = msg.content
+    [_ | [command | _]] = msg.content |> String.split
     action = query_data(:commands, "!#{command}")
 
     case action do
