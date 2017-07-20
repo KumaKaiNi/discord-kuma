@@ -121,7 +121,7 @@ defmodule DiscordKuma.Bot do
 
   def smug(msg) do
     url = "https://api.imgur.com/3/album/zSNC1"
-    auth = %{"Authorization" => "Client-ID #{Application.get_env(:twitch_kuma, :imgur_client_id)}"}
+    auth = %{"Authorization" => "Client-ID #{Application.get_env(:discord_kuma, :imgur_client_id)}"}
 
     request = HTTPoison.get!(url, auth)
     response = Poison.Parser.parse!((request.body), keys: :atoms)
@@ -132,7 +132,7 @@ defmodule DiscordKuma.Bot do
 
   def lastfm_np(msg) do
     timeframe = :os.system_time(:seconds) - 180
-    url = "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rekyuu&api_key=#{Application.get_env(:twitch_kuma, :lastfm_key)}&format=json&limit=1&from=#{timeframe}"
+    url = "http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=rekyuu&api_key=#{Application.get_env(:discord_kuma, :lastfm_key)}&format=json&limit=1&from=#{timeframe}"
 
     request = HTTPoison.get!(url)
     response = Poison.Parser.parse!((request.body), keys: :atoms)
