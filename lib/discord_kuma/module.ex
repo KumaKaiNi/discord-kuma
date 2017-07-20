@@ -69,6 +69,12 @@ defmodule DiscordKuma.Module do
     end
   end
 
+  defp make_match(body) when is_atom(body) do
+    quote do
+      unquote(body)(var!(msg))
+    end
+  end
+
   defp make_match(body) do
     quote do
       unquote(body)
