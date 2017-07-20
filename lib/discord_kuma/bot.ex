@@ -78,7 +78,7 @@ defmodule DiscordKuma.Bot do
         end
     end
 
-    reply "`[\##{quote_id}]` #{quote_text}"
+    reply "[\##{quote_id}] #{quote_text}"
   end
 
   def custom_command(msg) do
