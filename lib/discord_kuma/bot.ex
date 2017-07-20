@@ -152,7 +152,9 @@ defmodule DiscordKuma.Bot do
   handle :PRESENCE_UPDATE do
     IO.inspect msg
     if msg.game do
-      if msg.game.url, do: Logger.warn "[stream] #{msg.game.name} @ #{msg.game.url}"
+      if msg.game.type == 1 do
+        Logger.warn "[stream] #{msg.game.name} @ #{msg.game.url}"
+      end
     end
   end
 
