@@ -150,7 +150,6 @@ defmodule DiscordKuma.Bot do
   handle :TYPING_START, do: nil
 
   handle :PRESENCE_UPDATE do
-    Logger.warn "[event] :PRESENCE_UPDATE"
     IO.inspect msg.game
 
     if msg.game do
