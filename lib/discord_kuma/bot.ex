@@ -20,13 +20,15 @@ defmodule DiscordKuma.Bot do
   end
 
   handle :MESSAGE_CREATE do
-    match "!hi", :hello
+    match "!help", :help
     match ["hello", "hi", "hey", "sup"], :hello
 
     enforce :admin do
       match "!kuma", do: reply "Kuma~!"
     end
   end
+
+  def help(msg), do: reply "ok"
 
   def hello(msg) do
     replies = ["sup loser", "yo", "ay", "hi", "wassup"]
