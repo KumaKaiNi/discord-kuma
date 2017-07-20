@@ -71,7 +71,7 @@ defmodule DiscordKuma.Bot do
     request =  HTTPoison.get! url
 
     case request.body do
-      "Channel is not live." -> reply "Stream is not online!"
+      "rekyuus is offline" -> reply "Stream is not online!"
       time -> reply "Stream has been live for #{time}."
     end
   end
