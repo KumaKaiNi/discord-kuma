@@ -94,15 +94,10 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro log(text) do
+  defmacro reply(text, chan: channel_id) do
     quote do
-      var!(db) = query_data("guilds", var!(guild_id))
-
-      case var!(db).log do
-       nil -> nil
-       log_channel ->
-         Api.create_message(log_channel, unquote(text))
-      end
+      Api.start_typing!(var!(msg).channel_id)
+      Api.create_message(unquote(channel_id), unquote(text))
     end
   end
 end

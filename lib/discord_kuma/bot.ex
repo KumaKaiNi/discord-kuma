@@ -83,6 +83,7 @@ defmodule DiscordKuma.Bot do
         if msg.game.type == 1 do
           stream_title = msg.game.name
           stream_url = msg.game.url
+          log_chan = query_data("guilds", guild_id).log
 
           stream_list = query_data("streams", guild_id)
 
@@ -96,9 +97,9 @@ defmodule DiscordKuma.Bot do
 
             case user_id do
               107977662680571904 ->
-                log "@here **#{username} is now live!\n#{stream_title}\n#{stream_url}**"
+                reply "@here **#{username} is now live!\n#{stream_title}\n#{stream_url}**", chan: log_chan
               _ ->
-                log "**#{username} is now live!\n#{stream_title}\n#{stream_url}**"
+                reply "**#{username} is now live!\n#{stream_title}\n#{stream_url}**", chan: log_chan
             end
           end
         end
