@@ -61,7 +61,7 @@ defmodule DiscordKuma.Bot do
       match "!setup", :setup
       match "!addrole", :add_role
       match "!delrole", :del_role
-      match "!setlog", :set_log_channel
+      #match "!setlog", :set_log_channel
       match "!add", :add_custom_command
       match "!del", :del_custom_command
       match "!addquote", :add_quote
