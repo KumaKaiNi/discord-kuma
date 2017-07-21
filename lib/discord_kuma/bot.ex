@@ -222,17 +222,20 @@ defmodule DiscordKuma.Bot do
     [_ | roll] = msg.content |> String.split
 
     case roll do
-      [] -> reply Enum.random(1..6)
+      [] -> reply "#{Enum.random(1..6)}"
       [roll] ->
         [count | amount] = roll |> String.split("d")
 
         case amount do
-          [] -> if count > 1, do: Enum.random(1..count)
+          [] -> if count > 1, do: reply "#{Enum.random(1..count)}"
           [amount] ->
-            rolls = for _ <- count do
-              "#{Enum.random(1..amount)}"
+            if count > 1 do
+              rolls = for _ <- 1..count do
+                "#{Enum.random(1..amount)}"
+              end
+
+              reply rolls |> Enum.join(", ")
             end
-            reply rolls |> Enum.join(", ")
         end
     end
   end
