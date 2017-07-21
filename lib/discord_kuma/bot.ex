@@ -77,62 +77,67 @@ defmodule DiscordKuma.Bot do
 
     if msg.game do
       if msg.game.type do
-        if msg.game.type == 1 do
-          stream_title = msg.game.name
-          stream_url = msg.game.url
-          twitch_username = msg.game.url |> String.split("/") |> List.last
-          log_chan = query_data("guilds", guild_id).log
+        case msg.game.type do
+          0 -> remove_streamer(guild_id, user_id)
+          1 ->
+            stream_title = msg.game.name
+            stream_url = msg.game.url
+            twitch_username = msg.game.url |> String.split("/") |> List.last
+            log_chan = query_data("guilds", guild_id).log
 
-          stream_list = query_data("streams", guild_id)
+            stream_list = query_data("streams", guild_id)
 
-          stream_list = case stream_list do
-            nil -> []
-            streams -> streams
-          end
-
-          unless Enum.member?(stream_list, user_id) do
-            store_data("streams", guild_id, stream_list ++ [user_id])
-
-            message = case user_id do
-              107977662680571904 -> "@here **#{twitch_username}** is now live on Twitch!"
-              _ -> "**#{twitch_username}** is now live on Twitch!"
+            stream_list = case stream_list do
+              nil -> []
+              streams -> streams
             end
 
-            twitch_user = "https://api.twitch.tv/kraken/users?login=#{twitch_username}"
-            headers = %{"Accept" => "application/vnd.twitchtv.v5+json", "Client-ID" => "#{Application.get_env(:discord_kuma, :twitch_client_id)}"}
+            unless Enum.member?(stream_list, user_id) do
+              store_data("streams", guild_id, stream_list ++ [user_id])
 
-            request = HTTPoison.get!(twitch_user, headers)
-            response = Poison.Parser.parse!((request.body), keys: :atoms)
-            user = response.users |> List.first
+              message = case user_id do
+                107977662680571904 -> "@here **#{twitch_username}** is now live on Twitch!"
+                _ -> "**#{twitch_username}** is now live on Twitch!"
+              end
 
-            reply [content: message, embed: %Nostrum.Struct.Embed{
-              color: 0x4b367c,
-              title: "Watch #{username} on Twitch.tv",
-              url: "#{stream_url}",
-              description: "#{stream_title}",
-              thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
-              timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
-            }], chan: log_chan
+              twitch_user = "https://api.twitch.tv/kraken/users?login=#{twitch_username}"
+              headers = %{"Accept" => "application/vnd.twitchtv.v5+json", "Client-ID" => "#{Application.get_env(:discord_kuma, :twitch_client_id)}"}
+
+              request = HTTPoison.get!(twitch_user, headers)
+              response = Poison.Parser.parse!((request.body), keys: :atoms)
+              user = response.users |> List.first
+
+              reply [content: message, embed: %Nostrum.Struct.Embed{
+                color: 0x4b367c,
+                title: "Watch #{username} on Twitch.tv",
+                url: "#{stream_url}",
+                description: "#{stream_title}",
+                thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
+                timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
+              }], chan: log_chan
           end
         end
       end
     end
 
-    unless msg.game do
-      stream_list = query_data("streams", guild_id)
-
-      stream_list = case stream_list do
-        nil -> []
-        streams -> streams
-      end
-
-      if Enum.member?(stream_list, user_id) do
-        store_data("streams", guild_id, stream_list -- [user_id])
-      end
-    end
+    unless msg.game, do: remove_streamer(guild_id, user_id)
   end
 
   handle _event, do: nil
+
+  # Remove an individual who is not streaming
+  def remove_streamer(guild_id, user_id)
+    stream_list = query_data("streams", guild_id)
+
+    stream_list = case stream_list do
+      nil -> []
+      streams -> streams
+    end
+
+    if Enum.member?(stream_list, user_id) do
+      store_data("streams", guild_id, stream_list -- [user_id])
+    end
+  end
 
   # Rate limited user commands
   def help(msg), do: reply "https://github.com/KumaKaiNi/discord-kuma"
