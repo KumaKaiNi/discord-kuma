@@ -1,7 +1,6 @@
 defmodule DiscordKuma.Bot do
   use DiscordKuma.Module
   import DiscordKuma.Util
-  require Logger
 
   # Enforcers
   def admin(msg) do
@@ -69,6 +68,7 @@ defmodule DiscordKuma.Bot do
     end
 
     match ["hello", "hi", "hey", "sup"], :hello
+    match ["same", "Same", "SAME"], :same
 
     enforce :admin do
       match "!kuma", :kuma
@@ -456,6 +456,10 @@ defmodule DiscordKuma.Bot do
     if one_to(25) do
       reply Enum.random(replies)
     end
+  end
+
+  def same(msg) do
+    if one_to(25), do: reply "same"
   end
 
   # Administrative commands
