@@ -48,6 +48,7 @@ defmodule DiscordKuma.Bot do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
       match "!avatar", :avatar
+      match "!safe", :safebooru
       match "!uptime", :uptime
       match "!time", :local_time
       match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
@@ -61,6 +62,8 @@ defmodule DiscordKuma.Bot do
 
       enforce :nsfw do
         match "!dan", :danbooru
+        match "!ecchi", :ecchibooru
+        match "!lewd", :lewdbooru
       end
     end
 
@@ -296,6 +299,43 @@ defmodule DiscordKuma.Bot do
         {tag1, tag2}
     end
 
+    reply_danbooru(msg, tag1, tag2)
+  end
+
+  def safebooru(msg) do
+    {tag1, tag2} = case length(msg.content |> String.split) do
+      1 -> {"order:rank", "rating:s"}
+      _ ->
+        [_ | [tag1 | _]] = msg.content |> String.split
+        {tag1, "rating:s"}
+    end
+
+    reply_danbooru(msg, tag1, tag2)
+  end
+
+  def lewdbooru(msg) do
+    {tag1, tag2} = case length(msg.content |> String.split) do
+      1 -> {"order:rank", "rating:e"}
+      _ ->
+        [_ | [tag1 | _]] = msg.content |> String.split
+        {tag1, "rating:e"}
+    end
+
+    reply_danbooru(msg, tag1, tag2)
+  end
+
+  def ecchibooru(msg) do
+    {tag1, tag2} = case length(msg.content |> String.split) do
+      1 -> {"order:rank", "rating:q"}
+      _ ->
+        [_ | [tag1 | _]] = msg.content |> String.split
+        {tag1, "rating:q"}
+    end
+
+    reply_danbooru(msg, tag1, tag2)
+  end
+
+  def reply_danbooru(msg, tag1, tag2) do
     case danbooru(tag1, tag2) do
       {post_id, image, result} ->
         character = result.tag_string_character |> String.split
