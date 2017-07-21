@@ -227,11 +227,14 @@ defmodule DiscordKuma.Bot do
         [count | amount] = roll |> String.split("d")
 
         case amount do
-          [] -> if count > 1, do: reply "#{Enum.random(1..count)}"
+          [] ->
+            if String.to_integer(count) > 1 do
+              reply "#{Enum.random(1..count)}"
+            end
           [amount] ->
-            if count > 1 do
-              rolls = for _ <- 1..count do
-                "#{Enum.random(1..amount)}"
+            if String.to_integer(count) > 1 do
+              rolls = for _ <- 1..String.to_integer(count) do
+                "#{Enum.random(1..String.to_integer(amount))}"
               end
 
               reply rolls |> Enum.join(", ")
