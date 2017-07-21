@@ -304,6 +304,21 @@ defmodule DiscordKuma.Bot do
         artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
         {char, copy} =
           case {length(character), length(copyright)} do
+            {2, _} ->
+              first_char =
+                List.first(character)
+                |> String.split("(")
+                |> List.first
+                |> titlecase("_")
+
+              second_char =
+                List.last(character)
+                |> String.split("(")
+                |> List.first
+                |> titlecase("_")
+
+              {"#{first_char} and #{second_char}",
+               List.first(copyright) |> titlecase("_")}
             {1, _} ->
               {List.first(character)
                |> String.split("(")
@@ -314,13 +329,27 @@ defmodule DiscordKuma.Bot do
             {_, _} -> {"Multiple", "Various"}
           end
 
-        reply [content: "", embed: %Nostrum.Struct.Embed{
-          color: 0x00b6b6,
-          title: "danbooru.donmai.us",
-          url: "https://danbooru.donmai.us/posts/#{post_id}",
-          description: "#{char} - #{copy}\nDrawn by #{artist}",
-          image: %Nostrum.Struct.Embed.Image{url: image}
-        }]
+        extension = result |> String.split(".") |> List.last
+
+        cond do
+          Enum.member?(["jpg", "png", "gif"], extension) ->
+            reply [content: "", embed: %Nostrum.Struct.Embed{
+              color: 0x00b6b6,
+              title: "danbooru.donmai.us",
+              url: "https://danbooru.donmai.us/posts/#{post_id}",
+              description: "#{char} - #{copy}\nDrawn by #{artist}",
+              image: %Nostrum.Struct.Embed.Image{url: image}
+            }]
+          true ->
+            thumbnail = "http://danbooru.donmai.us#{result.preview_file_url}"
+            reply [content: "", embed: %Nostrum.Struct.Embed{
+              color: 0x00b6b6,
+              title: "danbooru.donmai.us",
+              url: "https://danbooru.donmai.us/posts/#{post_id}",
+              description: "#{char} - #{copy}\nDrawn by #{artist}",
+              image: %Nostrum.Struct.Embed.Thumbnail{url: thumbnail}
+            }]
+        end
       message -> reply message
     end
   end
