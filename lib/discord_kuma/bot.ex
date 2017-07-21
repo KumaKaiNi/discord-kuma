@@ -287,7 +287,7 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  # NSFW commands
+  # Danbooru commands
   def danbooru(msg) do
     {tag1, tag2} = case length(msg.content |> String.split) do
       1 -> {"order:rank", ""}
@@ -336,61 +336,72 @@ defmodule DiscordKuma.Bot do
   end
 
   def reply_danbooru(msg, tag1, tag2) do
-    case danbooru(tag1, tag2) do
-      {post_id, image, result} ->
-        character = result.tag_string_character |> String.split
-        copyright = result.tag_string_copyright |> String.split
+    case tag1 do
+      "help" -> reply
+        "Danbooru is a anime imageboard. You can search up to two tags with this command or you can leave it blank for something random. For details on tags, see <https://danbooru.donmai.us/wiki_pages/43037>.
 
-        artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
-        {char, copy} =
-          case {length(character), length(copyright)} do
-            {2, _} ->
-              first_char =
-                List.first(character)
-                |> String.split("(")
-                |> List.first
-                |> titlecase("_")
+        **Available Danbooru commands**
+        `!dan :tag1 :tag2` - default command
+        `!safe :tag1` - applies `rating:safe` tag
+        `!ecchi :tag1` - applies `rating:questionable` tag
+        `!lewd :tag1` - applies `rating:explicit` tag"
+    _ ->
+      case danbooru(tag1, tag2) do
+        {post_id, image, result} ->
+          character = result.tag_string_character |> String.split
+          copyright = result.tag_string_copyright |> String.split
 
-              second_char =
-                List.last(character)
-                |> String.split("(")
-                |> List.first
-                |> titlecase("_")
+          artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
+          {char, copy} =
+            case {length(character), length(copyright)} do
+              {2, _} ->
+                first_char =
+                  List.first(character)
+                  |> String.split("(")
+                  |> List.first
+                  |> titlecase("_")
 
-              {"#{first_char} and #{second_char}",
-               List.first(copyright) |> titlecase("_")}
-            {1, _} ->
-              {List.first(character)
-               |> String.split("(")
-               |> List.first
-               |> titlecase("_"),
-               List.first(copyright) |> titlecase("_")}
-            {_, 1} -> {"Multiple", List.first(copyright) |> titlecase("_")}
-            {_, _} -> {"Multiple", "Various"}
+                second_char =
+                  List.last(character)
+                  |> String.split("(")
+                  |> List.first
+                  |> titlecase("_")
+
+                {"#{first_char} and #{second_char}",
+                 List.first(copyright) |> titlecase("_")}
+              {1, _} ->
+                {List.first(character)
+                 |> String.split("(")
+                 |> List.first
+                 |> titlecase("_"),
+                 List.first(copyright) |> titlecase("_")}
+              {_, 1} -> {"Multiple", List.first(copyright) |> titlecase("_")}
+              {_, _} -> {"Multiple", "Various"}
+            end
+
+          extension = image |> String.split(".") |> List.last
+
+          cond do
+            Enum.member?(["jpg", "png", "gif"], extension) ->
+              reply [content: "", embed: %Nostrum.Struct.Embed{
+                color: 0x00b6b6,
+                title: "danbooru.donmai.us",
+                url: "https://danbooru.donmai.us/posts/#{post_id}",
+                description: "#{char} - #{copy}\nDrawn by #{artist}",
+                image: %Nostrum.Struct.Embed.Image{url: image}
+              }]
+            true ->
+              thumbnail = "http://danbooru.donmai.us#{result.preview_file_url}"
+              reply [content: "", embed: %Nostrum.Struct.Embed{
+                color: 0x00b6b6,
+                title: "danbooru.donmai.us",
+                url: "https://danbooru.donmai.us/posts/#{post_id}",
+                description: "#{char} - #{copy}\nDrawn by #{artist}",
+                image: %Nostrum.Struct.Embed.Thumbnail{url: thumbnail}
+              }]
           end
-
-        extension = image |> String.split(".") |> List.last
-
-        cond do
-          Enum.member?(["jpg", "png", "gif"], extension) ->
-            reply [content: "", embed: %Nostrum.Struct.Embed{
-              color: 0x00b6b6,
-              title: "danbooru.donmai.us",
-              url: "https://danbooru.donmai.us/posts/#{post_id}",
-              description: "#{char} - #{copy}\nDrawn by #{artist}",
-              image: %Nostrum.Struct.Embed.Image{url: image}
-            }]
-          true ->
-            thumbnail = "http://danbooru.donmai.us#{result.preview_file_url}"
-            reply [content: "", embed: %Nostrum.Struct.Embed{
-              color: 0x00b6b6,
-              title: "danbooru.donmai.us",
-              url: "https://danbooru.donmai.us/posts/#{post_id}",
-              description: "#{char} - #{copy}\nDrawn by #{artist}",
-              image: %Nostrum.Struct.Embed.Thumbnail{url: thumbnail}
-            }]
-        end
-      message -> reply message
+        message -> reply message
+      end
     end
   end
 
