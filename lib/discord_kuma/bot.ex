@@ -229,7 +229,7 @@ defmodule DiscordKuma.Bot do
         case amount do
           [] ->
             if String.to_integer(count) > 1 do
-              reply "#{Enum.random(1..count)}"
+              reply "#{Enum.random(1..String.to_integer(count))}"
             end
           [amount] ->
             if String.to_integer(count) > 1 do
