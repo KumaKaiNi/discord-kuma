@@ -96,7 +96,7 @@ defmodule DiscordKuma.Module do
 
   defmacro log(text) do
     quote do
-      var!(db) = query_data("guilds", Nostrum.Api.get_channel!(var!(msg).channel_id)["guild_id"])
+      var!(db) = query_data("guilds", var!(guild_id))
 
       case var!(db).log do
        nil -> nil
