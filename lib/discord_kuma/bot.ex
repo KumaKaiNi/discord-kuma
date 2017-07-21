@@ -93,7 +93,13 @@ defmodule DiscordKuma.Bot do
 
           unless Enum.member?(stream_list, user_id) do
             store_data("streams", guild_id, stream_list ++ [user_id])
-            log "**#{username} is now live!\n#{stream_title}\n#{stream_url}**"
+
+            case user_id do
+              107977662680571904 ->
+                log "@here **#{username} is now live!\n#{stream_title}\n#{stream_url}**"
+              _ ->
+                log "**#{username} is now live!\n#{stream_title}\n#{stream_url}**"
+            end
           end
         end
       end
