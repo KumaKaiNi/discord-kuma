@@ -168,7 +168,7 @@ defmodule DiscordKuma.Bot do
 
   def avatar(msg) do
     user = msg.mentions |> List.first
-    url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
+    url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}?size=1024"
 
     reply [content: "", embed: %Nostrum.Struct.Embed{
       color: 0x00b6b6,
