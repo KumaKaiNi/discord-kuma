@@ -60,7 +60,7 @@ defmodule DiscordKuma.Bot do
       match_all :custom_command
 
       enforce :nsfw do
-        match "!owo", do: reply "what's this?"
+        match "!dan", :danbooru
       end
     end
 
@@ -281,6 +281,31 @@ defmodule DiscordKuma.Bot do
     case action do
       nil -> nil
       action -> reply action
+    end
+  end
+
+  # NSFW commands
+  def danbooru(msg) do
+    {tag1, tag2} = case length(msg.content |> String.split) do
+      1 -> {"order:rank", ""}
+      2 ->
+        [_ | [tag1 | _]] = msg.content |> String.split
+        {tag1, ""}
+      _ ->
+        [_ | [tag1 | [tag2 | _]]] = msg.content |> String.split
+        {tag1, tag2}
+    end
+
+    case danbooru(tag1, tag2) do
+      {artist, post_id, image} ->
+        reply [content: "", embed: %Nostrum.Struct.Embed{
+          color: 0x00b6b6,
+          title: "danbooru.donmai.us",
+          url: "https://danbooru.donmai.us/posts/#{post_id}",
+          description: "Artist: #{artist}",
+          image: %Nostrum.Struct.Embed.Image{url: image}
+        }]
+      message -> reply message
     end
   end
 

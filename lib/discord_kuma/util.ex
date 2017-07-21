@@ -26,8 +26,9 @@ defmodule DiscordKuma.Util do
 
       artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
       post_id = Integer.to_string(result.id)
+      image = "http://#{dan}#{result.file_url}"
 
-      {artist, post_id}
+      {artist, post_id, image}
     rescue
       Enum.EmptyError -> "Nothing found!"
       UndefinedFunctionError -> "Nothing found!"
