@@ -98,6 +98,19 @@ defmodule DiscordKuma.Bot do
         end
       end
     end
+
+    unless msg.game do
+      stream_list = query_data("streams", guild_id)
+
+      stream_list = case stream_list do
+        nil -> []
+        streams -> streams
+      end
+
+      if Enum.member?(stream_list, user_id) do
+        store_data("streams", guild_id, stream_list -- [user_id])
+      end
+    end
   end
 
   handle _event, do: nil
