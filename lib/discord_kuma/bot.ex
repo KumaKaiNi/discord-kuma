@@ -31,6 +31,11 @@ defmodule DiscordKuma.Bot do
     command = msg.content |> String.split |> List.first
     {rate, _} = ExRated.check_rate(command, 10_000, 1)
 
+    rate = case admin(msg) do
+      true  -> :ok
+      false -> rate
+    end
+
     case rate do
       :ok    -> true
       :error -> false
