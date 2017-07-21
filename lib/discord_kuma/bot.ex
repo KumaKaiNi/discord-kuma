@@ -257,7 +257,7 @@ defmodule DiscordKuma.Bot do
   # Administrative commands
   def kuma(msg) do
     IO.inspect msg
-    reply "Kuma~!"
+    reply [content: "Kuma~!", embed: %Nostrum.Struct.Embed{color: 1, description: "description", footer: "footer", image: %Nostrum.Struct.Embed.Image{url: "https://static-cdn.jtvnw.net/jtv_user_pictures/950f5a7f09073327-profile_image-300x300.png"}, thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "https://static-cdn.jtvnw.net/jtv_user_pictures/950f5a7f09073327-profile_image-300x300.png"}, title: "title", url: "https://riichi.me"}]
   end
 
   def setup(msg) do
