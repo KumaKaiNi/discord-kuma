@@ -38,6 +38,11 @@ defmodule DiscordKuma.Bot do
     end
   end
 
+  def nsfw(msg) do
+    {:ok, channel} = Nostrum.Api.get_channel(msg.channel_id)
+    channel["nsfw"]
+  end
+
   # Event handlers
   handle :MESSAGE_CREATE do
     enforce :rate_limit do
@@ -53,6 +58,10 @@ defmodule DiscordKuma.Bot do
       match "!quote", :get_quote
       match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
       match_all :custom_command
+
+      enforce :nsfw do
+        match "!owo", do: reply "what's this?"
+      end
     end
 
     match ["hello", "hi", "hey", "sup"], :hello
