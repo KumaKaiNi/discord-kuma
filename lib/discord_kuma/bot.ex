@@ -337,7 +337,7 @@ defmodule DiscordKuma.Bot do
 
   def reply_danbooru(msg, tag1, tag2) do
     case tag1 do
-      "help" -> reply "Danbooru is a anime imageboard. You can search up to two tags with this command or you can leave it blank for something random. For details on tags, see <https://danbooru.donmai.us/wiki_pages/43037>.\n\n**Available Danbooru commands**\n`!dan :tag1 :tag2` - default command\n`!safe :tag1` - applies `rating:safe` tag\n`!ecchi :tag1` - applies `rating:questionable` tag\n`!lewd :tag1` - applies `rating:explicit` tag"
+      "help" -> reply "Danbooru is a anime imageboard. You can search up to two tags with this command or you can leave it blank for something random. For details on tags, see <https://danbooru.donmai.us/wiki_pages/43037>.\n\n**Available Danbooru commands**\n`!dan :tag1 :tag2` - default command\n`!safe :tag1` - applies `rating:safe` tag\n`!ecchi :tag1` - applies `rating:questionable` tag\n`!lewd :tag1` - applies `rating:explicit` tag\n\n`!safe` will work anywhere, but the other commands can only be done in NSFW channels."
     _ ->
       case danbooru(tag1, tag2) do
         {post_id, image, result} ->
