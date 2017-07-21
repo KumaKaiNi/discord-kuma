@@ -96,7 +96,7 @@ defmodule DiscordKuma.Module do
 
   defmacro reply(text, chan: channel_id) do
     quote do
-      Api.start_typing!(var!(msg).channel_id)
+      Api.start_typing!(unquote(channel_id))
       Api.create_message(unquote(channel_id), unquote(text))
     end
   end
