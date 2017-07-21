@@ -80,7 +80,7 @@ defmodule DiscordKuma.Bot do
         if msg.game.type == 1 do
           stream_title = msg.game.name
           stream_url = msg.game.url
-          twitch_username = msg.game.url |> String.split("") |> List.last
+          twitch_username = msg.game.url |> String.split("/") |> List.last
           log_chan = query_data("guilds", guild_id).log
 
           stream_list = query_data("streams", guild_id)
