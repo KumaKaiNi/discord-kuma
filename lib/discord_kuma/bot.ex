@@ -115,7 +115,6 @@ defmodule DiscordKuma.Bot do
                 thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
                 timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
               }], chan: log_chan
-          end
         end
       end
     end
