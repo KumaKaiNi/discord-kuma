@@ -24,7 +24,6 @@ defmodule DiscordKuma.Util do
     try do
       result = Poison.Parser.parse!((request.body), keys: :atoms) |> Enum.random
 
-      artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
       post_id = Integer.to_string(result.id)
       image = "http://#{dan}#{result.file_url}"
 

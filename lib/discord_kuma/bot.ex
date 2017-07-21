@@ -298,13 +298,27 @@ defmodule DiscordKuma.Bot do
 
     case danbooru(tag1, tag2) do
       {post_id, image, result} ->
+        character = result.tag_string_character |> String.split
+        copyright = result.tag_string_copyright |> String.split
+
         artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
+        {char, copy} =
+          case {length(character), length(copyright)} do
+            {1, _} ->
+              {List.first(character)
+               |> String.split("(")
+               |> List.first
+               |> titlecase("_"),
+               List.first(copyright) |> titlecase("_")}
+            {_, 1} -> {"Multiple", List.first(copyright) |> titlecase("_")}
+            {_, _} -> {"Multiple", "Various"}
+          end
 
         reply [content: "", embed: %Nostrum.Struct.Embed{
           color: 0x00b6b6,
           title: "danbooru.donmai.us",
           url: "https://danbooru.donmai.us/posts/#{post_id}",
-          description: result.tag_string,
+          description: "#{char} - #{copy}\nDrawn by #{artist}",
           image: %Nostrum.Struct.Embed.Image{url: image}
         }]
       message -> reply message
