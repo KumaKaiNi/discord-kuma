@@ -76,6 +76,8 @@ defmodule DiscordKuma.Bot do
     username = member["user"]["username"]
 
     if msg.game do
+      IO.inspect msg.game
+
       if msg.game.type do
         if msg.game.type == 1 do
           stream_title = msg.game.name
