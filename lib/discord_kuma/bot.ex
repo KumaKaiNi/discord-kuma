@@ -47,15 +47,16 @@ defmodule DiscordKuma.Bot do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
       match "!avatar", :avatar
-      match "!safe", :safebooru
       match "!uptime", :uptime
       match "!time", :local_time
       match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
+      match ["!pick", "!choose"], :pick
       match "!predict", :prediction
       match "!smug", :smug
       match "!np", :lastfm_np
       match "!guidance", :souls_message
       match "!quote", :get_quote
+      match "!safe", :safebooru
       match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
       match_all :custom_command
 
@@ -200,6 +201,20 @@ defmodule DiscordKuma.Bot do
     end
 
     reply "It is #{h}:#{m} MST rekyuu's time."
+  end
+
+  def choose(msg) do
+    [_ | choices] = msg.content |> String.split
+
+    case choices do
+      [] -> nil
+      choices ->
+        choices_list = choices |> Enum.join(" ") |> String.split(", ")
+        case length(choices_list) do
+          1 -> reply "What? Okay, #{choices_list |> List.first}, I guess. Didn't really give me a choice there."
+          _ -> reply "#{choices_list |> Enum.random}"
+        end
+    end
   end
 
   def prediction(msg) do
