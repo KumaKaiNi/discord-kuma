@@ -64,7 +64,7 @@ defmodule DiscordKuma.Bot do
         match "!dan", :danbooru
         match "!ecchi", :ecchibooru
         match "!lewd", :lewdbooru
-        match ["nhen", "nhentai", "doujin"], :nhentai
+        match ["!nhen", "!nhentai", "!doujin"], :nhentai
       end
     end
 
@@ -435,7 +435,7 @@ defmodule DiscordKuma.Bot do
                 color: 0x00b6b6,
                 title: result.title.pretty,
                 url: "https://nhentai.net/g/#{result.id}",
-                description: "By #{artist}",
+                description: "#{artist}",
                 image: %Nostrum.Struct.Embed.Image{url: cover}
               }]
       rescue
