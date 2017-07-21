@@ -120,7 +120,7 @@ defmodule DiscordKuma.Bot do
       end
     end
 
-    unless msg.gamed do: remove_streamer(guild_id, user_id)
+    unless msg.game, do: remove_streamer(guild_id, user_id)
   end
 
   handle _event, do: nil
