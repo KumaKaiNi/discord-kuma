@@ -80,6 +80,7 @@ defmodule DiscordKuma.Bot do
         if msg.game.type == 1 do
           stream_title = msg.game.name
           stream_url = msg.game.url
+          twitch_username = msg.game.url |> String.split("") |> List.last
           log_chan = query_data("guilds", guild_id).log
 
           stream_list = query_data("streams", guild_id)
@@ -92,12 +93,26 @@ defmodule DiscordKuma.Bot do
           unless Enum.member?(stream_list, user_id) do
             store_data("streams", guild_id, stream_list ++ [user_id])
 
-            case user_id do
-              107977662680571904 ->
-                reply "@here **#{username}** is now live!\n#{stream_title}\n#{stream_url}", chan: log_chan
-              _ ->
-                reply "**#{username}** is now live!\n#{stream_title}\n#{stream_url}", chan: log_chan
+            message = case user_id do
+              107977662680571904 -> "@here **#{twitch_username}** is now live on Twitch!"
+              _ -> "**#{twitch_username}** is now live on Twitch!"
             end
+
+            twitch_user = "https://api.twitch.tv/kraken/users?login=#{twitch_username}"
+            headers = %{"Accept" => "application/vnd.twitchtv.v5+json", "Client-ID" => "#{Application.get_env(:discord_kuma, :twitch_client_id)}"}
+
+            request = HTTPoison.get!(twitch_user, headers)
+            response = Poison.Parser.parse!((request.body), keys: :atoms)
+            user = response.users |> List.first
+
+            reply [content: message, embed: %Nostrum.Struct.Embed{
+              color: 0x4b367c,
+              title: "Watch #{username} on Twitch.tv",
+              url: "#{stream_url}",
+              description: "#{stream_title}",
+              thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
+              timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
+            }], chan: log_chan
           end
         end
       end
@@ -257,7 +272,7 @@ defmodule DiscordKuma.Bot do
   # Administrative commands
   def kuma(msg) do
     IO.inspect msg
-    reply [content: "Kuma~!", embed: %Nostrum.Struct.Embed{color: 1, description: "description", footer: "footer", image: %Nostrum.Struct.Embed.Image{url: "https://static-cdn.jtvnw.net/jtv_user_pictures/950f5a7f09073327-profile_image-300x300.png"}, thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "https://static-cdn.jtvnw.net/jtv_user_pictures/950f5a7f09073327-profile_image-300x300.png"}, title: "title", url: "https://riichi.me"}]
+    reply "Kuma~!"
   end
 
   def setup(msg) do
