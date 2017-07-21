@@ -97,9 +97,9 @@ defmodule DiscordKuma.Bot do
 
             case user_id do
               107977662680571904 ->
-                reply "@here **#{username} is now live!\n#{stream_title}\n#{stream_url}**", chan: log_chan
+                reply "@here **#{username}** is now live!\n#{stream_title}\n#{stream_url}", chan: log_chan
               _ ->
-                reply "**#{username} is now live!\n#{stream_title}\n#{stream_url}**", chan: log_chan
+                reply "**#{username}** is now live!\n#{stream_title}\n#{stream_url}", chan: log_chan
             end
           end
         end
@@ -318,7 +318,6 @@ defmodule DiscordKuma.Bot do
   def set_log_channel(msg) do
     guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
     db = query_data("guilds", guild_id)
-    channel_id = msg.channel_id
 
     db = Map.put(db, :log, msg.channel_id)
     store_data("guilds", guild_id, db)
