@@ -150,7 +150,7 @@ defmodule DiscordKuma.Bot do
 
     reply [content: "", embed: %Nostrum.Struct.Embed{
       color: 0x00b6b6,
-      image: %Nostrum.Struct.Embed.Image%{url: url}
+      image: %Nostrum.Struct.Embed.Image{url: url}
     }]
   end
 
