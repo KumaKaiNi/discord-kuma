@@ -98,7 +98,7 @@ defmodule DiscordKuma.Module do
     quote do
       var!(db) = query_data("guilds", Nostrum.Api.get_channel!(var!(msg).channel_id)["guild_id"])
 
-      case var!(db).log_channel do
+      case var!(db).log do
        nil -> nil
        log_channel ->
          Api.create_message(log_channel, unquote(text))

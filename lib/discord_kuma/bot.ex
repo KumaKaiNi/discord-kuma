@@ -82,7 +82,18 @@ defmodule DiscordKuma.Bot do
         if msg.game.type == 1 do
           stream_title = msg.game.name
           stream_url = msg.game.url
-          Logger.error "#{username} is now live! #{stream_title} #{stream_url}"
+
+          stream_list = query_data("streams", guild_id)
+
+          stream_list = case stream_list do
+            nil -> []
+            streams -> streams
+          end
+
+          unless Enum.member?(stream_list, user_id) do
+            store_data("streams", guild_id, stream_list ++ [user_id])
+            log "**#{username} is now live!\n#{stream_title}\n#{stream_url}**"
+          end
         end
       end
     end
