@@ -42,6 +42,7 @@ defmodule DiscordKuma.Bot do
   handle :MESSAGE_CREATE do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
+      match "!avatar", :avatar
       match "!uptime", :uptime
       match "!time", :local_time
       match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
@@ -62,6 +63,7 @@ defmodule DiscordKuma.Bot do
       match "!addrole", :add_role
       match "!delrole", :del_role
       match "!setlog", :set_log_channel
+      match "!dellog", :del_log_channel
       match "!add", :add_custom_command
       match "!del", :del_custom_command
       match "!addquote", :add_quote
@@ -141,6 +143,16 @@ defmodule DiscordKuma.Bot do
 
   # Rate limited user commands
   def help(msg), do: reply "https://github.com/KumaKaiNi/discord-kuma"
+
+  def avatar(msg) do
+    user = msg.mentions |> List.first
+    url = "https://cdn.discordapp.com/avatars/#{user.id}/#{avatar}"
+
+    reply [content: "", embed: %Nostrum.Struct.Embed{
+      color: 0x00b6b6,
+      image: %Nostrum.Struct.Embed.Image%{url: url}
+    }]
+  end
 
   def uptime(msg) do
     url = "https://decapi.me/twitch/uptime?channel=rekyuus"
@@ -260,12 +272,12 @@ defmodule DiscordKuma.Bot do
     end
   end
 
+  # Commands that are not rate limited
   def ty_kuma(msg) do
     replies = ["np", "don't mention it", "anytime", "sure thing", "ye whateva"]
     reply Enum.random(replies)
   end
 
-  # Random replies
   def hello(msg) do
     replies = ["sup loser", "yo", "ay", "hi", "wassup"]
 
@@ -339,6 +351,15 @@ defmodule DiscordKuma.Bot do
     db = Map.put(db, :log, msg.channel_id)
     store_data("guilds", guild_id, db)
     reply "Okay, I will announce streams here!"
+  end
+
+  def del_log_channel(msg) do
+    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+    db = query_data("guilds", guild_id)
+
+    db = Map.put(db, :log, nil)
+    store_data("guilds", guild_id, db)
+    reply "Okay, I will no longer announce streams."
   end
 
   def add_custom_command(msg) do
