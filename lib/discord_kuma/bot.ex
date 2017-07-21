@@ -203,7 +203,7 @@ defmodule DiscordKuma.Bot do
     reply "It is #{h}:#{m} MST rekyuu's time."
   end
 
-  def choose(msg) do
+  def pick(msg) do
     [_ | choices] = msg.content |> String.split
 
     case choices do
