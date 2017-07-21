@@ -61,7 +61,7 @@ defmodule DiscordKuma.Bot do
       match "!setup", :setup
       match "!addrole", :add_role
       match "!delrole", :del_role
-      #match "!setlog", :set_log_channel
+      match "!setlog", :set_log_channel
       match "!add", :add_custom_command
       match "!del", :del_custom_command
       match "!addquote", :add_quote
@@ -76,10 +76,12 @@ defmodule DiscordKuma.Bot do
     username = member["user"]["username"]
 
     if msg.game do
-      if msg.game.type == 1 do
-        stream_title = msg.game.name
-        stream_url = msg.game.url
-        Logger.error "#{username} is now live! #{stream_title} #{stream_url}"
+      if msg.game.type do
+        if msg.game.type == 1 do
+          stream_title = msg.game.name
+          stream_url = msg.game.url
+          Logger.error "#{username} is now live! #{stream_title} #{stream_url}"
+        end
       end
     end
   end
@@ -277,6 +279,16 @@ defmodule DiscordKuma.Bot do
             reply "Removed administrative roles."
         end
     end
+  end
+
+  def set_log_channel(msg) do
+    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+    db = query_data("guilds", guild_id)
+    channel_id = msg.channel_id
+
+    db = Map.put(db, :log, msg.channel_id)
+    store_data("guilds", guild_id, db)
+    reply "Okay, I will announce streams here!"
   end
 
   def add_custom_command(msg) do

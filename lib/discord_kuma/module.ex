@@ -93,4 +93,16 @@ defmodule DiscordKuma.Module do
       Api.create_message(var!(msg).channel_id, unquote(text))
     end
   end
+
+  defmacro log(text) do
+    quote do
+      var!(db) = query_data("guilds", Nostrum.Api.get_channel!(var!(msg).channel_id)["guild_id"])
+
+      case var!(db).log_channel do
+       nil -> nil
+       log_channel ->
+         Api.create_message(log_channel, unquote(text))
+      end
+    end
+  end
 end
