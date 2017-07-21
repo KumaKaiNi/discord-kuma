@@ -120,13 +120,13 @@ defmodule DiscordKuma.Bot do
       end
     end
 
-    unless msg.game, do: remove_streamer(guild_id, user_id)
+    unless msg.gamed do: remove_streamer(guild_id, user_id)
   end
 
   handle _event, do: nil
 
   # Remove an individual who is not streaming
-  def remove_streamer(guild_id, user_id)
+  def remove_streamer(guild_id, user_id) do
     stream_list = query_data("streams", guild_id)
 
     stream_list = case stream_list do
