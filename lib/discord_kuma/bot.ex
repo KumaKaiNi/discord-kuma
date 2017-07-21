@@ -329,7 +329,7 @@ defmodule DiscordKuma.Bot do
             {_, _} -> {"Multiple", "Various"}
           end
 
-        extension = result |> String.split(".") |> List.last
+        extension = image |> String.split(".") |> List.last
 
         cond do
           Enum.member?(["jpg", "png", "gif"], extension) ->
