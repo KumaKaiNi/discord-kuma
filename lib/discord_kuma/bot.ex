@@ -215,7 +215,10 @@ defmodule DiscordKuma.Bot do
     response = Poison.Parser.parse!((request.body), keys: :atoms)
     result = response.data.images |> Enum.random
 
-    reply result.link
+    reply [content: "", embed: %Nostrum.Struct.Embed{
+      color: 0x00b6b6,
+      image: %Nostrum.Struct.Embed.Image{url: result.link}
+    }]
   end
 
   def lastfm_np(msg) do
