@@ -51,6 +51,7 @@ defmodule DiscordKuma.Bot do
       match "!time", :local_time
       match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
       match ["!pick", "!choose"], :pick
+      match "!roll", :roll
       match "!predict", :prediction
       match "!smug", :smug
       match "!np", :lastfm_np
@@ -213,6 +214,25 @@ defmodule DiscordKuma.Bot do
         case length(choices_list) do
           1 -> reply "What? Okay, #{choices_list |> List.first}, I guess. Didn't really give me a choice there."
           _ -> reply "#{choices_list |> Enum.random}"
+        end
+    end
+  end
+
+  def roll(msg) do
+    [_ | roll] = msg.content |> String.split
+
+    case roll do
+      [] -> reply Enum.random(1..6)
+      [roll] ->
+        [count | amount] = roll |> String.split("d")
+
+        case amount do
+          [] -> if count > 1, do: Enum.random(1..count)
+          [amount] ->
+            rolls = for _ <- count do
+              "#{Enum.random(1..amount)}"
+            end
+            reply rolls |> Enum.join(", ")
         end
     end
   end
