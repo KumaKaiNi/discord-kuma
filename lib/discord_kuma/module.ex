@@ -30,16 +30,6 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro match(text, body) when is_bitstring(text) do
-    make_match(text, body)
-  end
-
-  defmacro match(texts, body) when is_list(texts) do
-    for text <- texts do
-      make_match(text, body)
-    end
-  end
-
   defmacro match(text, do: body) when is_bitstring(text) do
     make_match(text, body)
   end
@@ -50,8 +40,18 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro match_all(body), do: make_match(body)
+  defmacro match(text, body) when is_bitstring(text) do
+    make_match(text, body)
+  end
+
+  defmacro match(texts, body) when is_list(texts) do
+    for text <- texts do
+      make_match(text, body)
+    end
+  end
+
   defmacro match_all(do: body), do: make_match(body)
+  defmacro match_all(body), do: make_match(body)
 
   defp make_match(text, body) when is_atom(body) do
     quote do
@@ -87,17 +87,17 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro reply(text) do
-    quote do
-      Api.start_typing!(var!(msg).channel_id)
-      Api.create_message(var!(msg).channel_id, unquote(text))
-    end
-  end
-
   defmacro reply(text, chan: channel_id) do
     quote do
       Api.start_typing!(unquote(channel_id))
       Api.create_message(unquote(channel_id), unquote(text))
+    end
+  end
+
+  defmacro reply(text) do
+    quote do
+      Api.start_typing!(var!(msg).channel_id)
+      Api.create_message(var!(msg).channel_id, unquote(text))
     end
   end
 end

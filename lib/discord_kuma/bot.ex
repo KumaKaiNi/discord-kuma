@@ -70,7 +70,7 @@ defmodule DiscordKuma.Bot do
   end
 
   handle :PRESENCE_UPDATE do
-    guild_id = msg.guild_id
+    guild_id = msg.guild_id |> Integer.to_string
     user_id = msg.user.id
     {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
     username = member["user"]["username"]
