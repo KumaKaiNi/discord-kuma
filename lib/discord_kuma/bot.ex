@@ -297,12 +297,14 @@ defmodule DiscordKuma.Bot do
     end
 
     case danbooru(tag1, tag2) do
-      {artist, post_id, image} ->
+      {post_id, image, result} ->
+        artist = result.tag_string_artist |> String.split("_") |> Enum.join(" ")
+
         reply [content: "", embed: %Nostrum.Struct.Embed{
           color: 0x00b6b6,
           title: "danbooru.donmai.us",
           url: "https://danbooru.donmai.us/posts/#{post_id}",
-          description: "Artist: #{artist}",
+          description: result.tag_string,
           image: %Nostrum.Struct.Embed.Image{url: image}
         }]
       message -> reply message

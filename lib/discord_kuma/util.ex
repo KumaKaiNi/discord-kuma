@@ -28,7 +28,7 @@ defmodule DiscordKuma.Util do
       post_id = Integer.to_string(result.id)
       image = "http://#{dan}#{result.file_url}"
 
-      {artist, post_id, image}
+      {post_id, image, result}
     rescue
       Enum.EmptyError -> "Nothing found!"
       UndefinedFunctionError -> "Nothing found!"
