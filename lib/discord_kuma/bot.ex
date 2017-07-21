@@ -111,8 +111,8 @@ defmodule DiscordKuma.Bot do
               store_data("streams", guild_id, stream_list ++ [user_id])
 
               message = case user_id do
-                107977662680571904 -> "**#{twitch_username}** is now live on Twitch! @here"
-                _ -> "**#{twitch_username}** is now live on Twitch!"
+                107977662680571904 -> "**#{username}** is now live on Twitch! @here"
+                _ -> "**#{username}** is now live on Twitch!"
               end
 
               twitch_user = "https://api.twitch.tv/kraken/users?login=#{twitch_username}"
@@ -124,7 +124,7 @@ defmodule DiscordKuma.Bot do
 
               reply [content: message, embed: %Nostrum.Struct.Embed{
                 color: 0x4b367c,
-                title: "Watch #{username} on Twitch.tv",
+                title: "Watch #{twitch_username} on Twitch.tv",
                 url: "#{stream_url}",
                 description: "#{stream_title}",
                 thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
