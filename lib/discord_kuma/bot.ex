@@ -75,9 +75,6 @@ defmodule DiscordKuma.Bot do
     {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
     username = member["user"]["username"]
 
-    Logger.error username
-    IO.inspect msg
-
     if msg.game do
       if msg.game.type do
         if msg.game.type == 1 do
