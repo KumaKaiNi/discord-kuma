@@ -96,7 +96,7 @@ defmodule DiscordKuma.Bot do
               store_data("streams", guild_id, stream_list ++ [user_id])
 
               message = case user_id do
-                107977662680571904 -> "@here **#{twitch_username}** is now live on Twitch!"
+                107977662680571904 -> "**#{twitch_username}** is now live on Twitch! @here"
                 _ -> "**#{twitch_username}** is now live on Twitch!"
               end
 
