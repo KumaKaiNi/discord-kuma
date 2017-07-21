@@ -32,10 +32,6 @@ defmodule DiscordKuma.Bot do
   end
 
   # Event handlers
-  handle :GUILD_CREATE do
-    IO.inspect msg
-  end
-
   handle :MESSAGE_CREATE do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
@@ -63,6 +59,13 @@ defmodule DiscordKuma.Bot do
       match "!addquote", :add_quote
       match "!delquote", :del_quote
     end
+  end
+
+  handle :PRESENCE_UPDATE do
+    guild_id = msg.guild_id
+    user_id = msg.user.id
+    guild = Nostrum.Api.get_guild!(guild_id)
+    Logger.error "#{guild_id}: #{guild.name}"
   end
 
   handle _event, do: nil
