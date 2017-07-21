@@ -22,7 +22,8 @@ defmodule DiscordKuma.Util do
     request = "http://#{dan}/posts.json?limit=50&page=1&tags=#{tag1}+#{tag2}" |> HTTPoison.get!
 
     try do
-      result = Poison.Parser.parse!((request.body), keys: :atoms) |> Enum.random
+      results = Poison.Parser.parse!((request.body), keys: :atoms)
+      result = results |> Enum.shuffle |> Enum.find(fn post -> is_image?(post.file_url) == true && is_dupe?("dan", post.file_url) == false end)
 
       post_id = Integer.to_string(result.id)
       image = "http://#{dan}#{result.file_url}"
@@ -46,6 +47,22 @@ defmodule DiscordKuma.Util do
     File.write filepath, image.body
 
     filepath
+  end
+
+  def is_dupe?(source, filename) do
+    Logger.info "Checking if #{filename} was last posted..."
+    file = query_data("dupes", source)
+
+    cond do
+      file == nil ->
+        store_data("dupes", source, filename)
+        false
+      file != filename ->
+        store_data("dupes", source, filename)
+        false
+      file == filename -> true
+      true -> nil
+    end
   end
 
   def is_image?(url) do

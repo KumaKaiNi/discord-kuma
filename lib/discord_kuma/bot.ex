@@ -64,6 +64,7 @@ defmodule DiscordKuma.Bot do
         match "!dan", :danbooru
         match "!ecchi", :ecchibooru
         match "!lewd", :lewdbooru
+        match ["nhen", "nhentai", "doujin"], :nhentai
       end
     end
 
@@ -394,6 +395,51 @@ defmodule DiscordKuma.Bot do
               }]
           end
         message -> reply message
+      end
+    end
+  end
+
+  def nhentai(msg) do
+    [_ | tags] = msg.content |> String.split
+
+    case tags do
+      [] -> reply "You must search with at least one tag."
+      tags ->
+        tags = for tag <- tags do
+          tag |> URI.encode_www_form
+        end |> Enum.join("+")
+
+        request = "https://nhentai.net/api/galleries/search?query=#{tags}&sort=popular" |> HTTPoison.get!
+        response = Poison.Parser.parse!((request.body), keys: :atoms)
+
+        try do
+          result = response.result |> Enum.shuffle |> Enum.find(fn doujin -> is_dupe?("nhentai", doujin.id) == false end)
+
+          filetype = case List.first(result.images.pages).t do
+            "j" -> "jpg"
+            "g" -> "gif"
+            "p" -> "png"
+          end
+
+          artists_tag = result.tags |> Enum.filter(fn(t) -> t.type == "artist" end)
+          artists = for tag <- artists_tag, do: tag.name
+
+          artist = case artists do
+            [] -> ""
+            artists -> "by #{artists |> Enum.sort |> Enum.join(", ")}\n"
+          end
+
+          cover = "https://i.nhentai.net/galleries/#{result.media_id}/1.#{filetype}"
+
+          reply [content: "", embed: %Nostrum.Struct.Embed{
+                color: 0x00b6b6,
+                title: result.title.pretty,
+                url: "https://nhentai.net/g/#{result.id}",
+                description: "By #{artist}",
+                image: %Nostrum.Struct.Embed.Image{url: cover}
+              }]
+      rescue
+        KeyError -> reply "Nothing found!"
       end
     end
   end
