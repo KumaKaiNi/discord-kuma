@@ -71,6 +71,17 @@ defmodule DiscordKuma.Bot do
   handle :PRESENCE_UPDATE do
     guild_id = msg.guild_id
     user_id = msg.user.id
+    {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
+    username = member["user"]["username"]
+
+    if msg.game do
+      if msg.game.type == 1 do
+        stream_title = msg.game.name
+        stream_url = msg.game.url
+        Logger.error "#{username} is now live! #{stream_title} #{stream_url}"
+      end
+    end
+
     guild = Nostrum.Api.get_guild!(guild_id)
     Logger.error "#{guild_id}: #{guild.name}"
   end
