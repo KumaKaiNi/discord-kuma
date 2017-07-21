@@ -54,6 +54,14 @@ defmodule DiscordKuma.Util do
     Enum.member?(image_types, Path.extname(url))
   end
 
+  def titlecase(title, mod) do
+    words = title |> String.split(mod)
+
+    for word <- words do
+      word |> String.capitalize
+    end |> Enum.join(" ")
+  end
+
   def store_data(table, key, value) do
     file = '/var/www/_db/#{table}.dets'
     {:ok, _} = :dets.open_file(table, [file: file, type: :set])
