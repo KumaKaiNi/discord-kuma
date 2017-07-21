@@ -122,9 +122,18 @@ defmodule DiscordKuma.Bot do
               response = Poison.Parser.parse!((request.body), keys: :atoms)
               user = response.users |> List.first
 
+              user_channel = "https://api.twitch.tv/kraken/channels/#{user._id}"
+              user_info_request = HTTPoison.get!(user_channel, headers)
+              user_info_response = Poison.Parser.parse!((user_info_request.body), keys: :atoms)
+
+              game = case user_info_response.game do
+                nil -> "streaming on Twitch.tv"
+                game -> "playing #{game}"
+              end
+
               reply [content: message, embed: %Nostrum.Struct.Embed{
                 color: 0x4b367c,
-                title: "Watch #{twitch_username} on Twitch.tv",
+                title: "#{twitch_username} #{game}",
                 url: "#{stream_url}",
                 description: "#{stream_title}",
                 thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
