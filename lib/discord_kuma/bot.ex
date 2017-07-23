@@ -31,6 +31,11 @@ defmodule DiscordKuma.Bot do
     command = msg.content |> String.split |> List.first
     {rate, _} = ExRated.check_rate(command, 10_000, 1)
 
+    rate = case admin(msg) do
+      true  -> :ok
+      false -> rate
+    end
+
     case rate do
       :ok    -> true
       :error -> false
@@ -47,15 +52,17 @@ defmodule DiscordKuma.Bot do
     enforce :rate_limit do
       match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
       match "!avatar", :avatar
-      match "!safe", :safebooru
       match "!uptime", :uptime
       match "!time", :local_time
       match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
+      match ["!pick", "!choose"], :pick
+      match "!roll", :roll
       match "!predict", :prediction
       match "!smug", :smug
       match "!np", :lastfm_np
       match "!guidance", :souls_message
       match "!quote", :get_quote
+      match "!safe", :safebooru
       match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
       match_all :custom_command
 
@@ -170,7 +177,7 @@ defmodule DiscordKuma.Bot do
 
   def avatar(msg) do
     user = msg.mentions |> List.first
-    url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}"
+    url = "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}?size=1024"
 
     reply [content: "", embed: %Nostrum.Struct.Embed{
       color: 0x00b6b6,
@@ -202,6 +209,45 @@ defmodule DiscordKuma.Bot do
     end
 
     reply "It is #{h}:#{m} MST rekyuu's time."
+  end
+
+  def pick(msg) do
+    [_ | choices] = msg.content |> String.split
+
+    case choices do
+      [] -> nil
+      choices ->
+        choices_list = choices |> Enum.join(" ") |> String.split(", ")
+        case length(choices_list) do
+          1 -> reply "What? Okay, #{choices_list |> List.first}, I guess. Didn't really give me a choice there."
+          _ -> reply "#{choices_list |> Enum.random}"
+        end
+    end
+  end
+
+  def roll(msg) do
+    [_ | roll] = msg.content |> String.split
+
+    case roll do
+      [] -> reply "#{Enum.random(1..6)}"
+      [roll] ->
+        [count | amount] = roll |> String.split("d")
+
+        case amount do
+          [] ->
+            if String.to_integer(count) > 1 do
+              reply "#{Enum.random(1..String.to_integer(count))}"
+            end
+          [amount] ->
+            if String.to_integer(count) > 1 do
+              rolls = for _ <- 1..String.to_integer(count) do
+                "#{Enum.random(1..String.to_integer(amount))}"
+              end
+
+              reply rolls |> Enum.join(", ")
+            end
+        end
+    end
   end
 
   def prediction(msg) do
