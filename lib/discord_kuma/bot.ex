@@ -147,7 +147,9 @@ defmodule DiscordKuma.Bot do
     unless msg.game, do: remove_streamer(guild_id, user_id)
   end
 
-  handle _event, do: nil
+  def handle_event(_, state) do
+    {:ok, state}
+  end
 
   # Remove an individual who is not streaming
   def remove_streamer(guild_id, user_id) do
