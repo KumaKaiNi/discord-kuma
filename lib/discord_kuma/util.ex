@@ -15,6 +15,16 @@ defmodule DiscordKuma.Util do
 
   def danbooru(tag1, tag2) do
     dan = "danbooru.donmai.us"
+    blacklist = ["what", "scat", "guro", "gore", "loli", "shota"]
+
+    safe1 = Enum.member?(blacklist, tag1)
+    safe2 = Enum.member?(blacklist, tag2)
+
+    {tag1, tag2} = case {safe1, safe2} do
+      {_, true}       -> {"shangguan_feiying", "meme"}
+      {true, _}       -> {"shangguan_feiying", "meme"}
+      {false, false}  -> {tag1, tag2}
+    end
 
     tag1 = tag1 |> String.split |> Enum.join("_") |> URI.encode_www_form
     tag2 = tag2 |> String.split |> Enum.join("_") |> URI.encode_www_form
