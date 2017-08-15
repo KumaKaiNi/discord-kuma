@@ -270,11 +270,11 @@ defmodule DiscordKuma.Bot do
                         kuma = query_data(:bank, "kumakaini")
                         store_data(:bank, "kumakaini", kuma + bet)
 
-                        reply "Sorry, you didn't win anything."
+                        "Sorry, you didn't win anything."
                       bonus ->
                         payout = bet * bonus
                         store_data(:bank, username, bank - bet + payout)
-                        reply "Congrats, you won #{payout} coins!"
+                        "Congrats, you won #{payout} coins!"
                     end
 
                     reply "[#{col1} #{col2} #{col3}] #{result}"
