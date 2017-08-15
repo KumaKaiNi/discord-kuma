@@ -170,31 +170,37 @@ defmodule DiscordKuma.Bot do
 
   # Direct message only commands
   def link_twitch_account(msg) do
-    [_ | [twitch_account | _]] = msg.content |> String.split
-    user_id = msg.author.id
-    user = query_data(:links, user_id)
-    all_users = query_data(:links, :users)
+    case msg.content |> String.split |> length do
+      1 -> reply "Usage: `!link <twitch username>"
+      _ ->
+        [_ | [twitch_account | _]] = msg.content |> String.split
+        twitch_account = twitch_account |> String.downcase
 
-    case user do
-      nil ->
-        cond do
-          Enum.member?(all_users, twitch_account) ->
-            reply "That username has already been taken."
-          true ->
-            all_users = all_users ++ [twitch_account]
-            store_data(:links, user_id, twitch_account)
-            store_data(:links, :users, all_users)
-            reply "Twitch account linked!"
-        end
-      user ->
-        cond do
-          Enum.member?(all_users, twitch_account) ->
-            reply "That username has already been taken."
-          true ->
-            all_users = (all_users -- [user]) ++ [twitch_account]
-            store_data(:links, user_id, twitch_account)
-            store_data(:links, :users, all_users)
-            reply "Twitch account updated!"
+        user_id = msg.author.id
+        user = query_data(:links, user_id)
+        all_users = query_data(:links, :users)
+
+        case user do
+          nil ->
+            cond do
+              Enum.member?(all_users, twitch_account) ->
+                reply "That username has already been taken."
+              true ->
+                all_users = all_users ++ [twitch_account]
+                store_data(:links, user_id, twitch_account)
+                store_data(:links, :users, all_users)
+                reply "Twitch account linked!"
+            end
+          user ->
+            cond do
+              Enum.member?(all_users, twitch_account) ->
+                reply "That username has already been taken."
+              true ->
+                all_users = (all_users -- [user]) ++ [twitch_account]
+                store_data(:links, user_id, twitch_account)
+                store_data(:links, :users, all_users)
+                reply "Twitch account updated!"
+            end
         end
     end
   end
