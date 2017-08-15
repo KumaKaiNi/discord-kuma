@@ -170,7 +170,7 @@ defmodule DiscordKuma.Bot do
 
   # Direct message only commands
   def link_twitch_account(msg) do
-    twitch_account = msg.content |> String.split |> List.first
+    [_ | [twitch_account | _]] = msg.content |> String.split
     user_id = msg.author.id
     user = query_data(:links, user_id)
     all_users = query_data(:links, :users)
