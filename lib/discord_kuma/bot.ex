@@ -171,7 +171,7 @@ defmodule DiscordKuma.Bot do
   # Direct message only commands
   def link_twitch_account(msg) do
     case msg.content |> String.split |> length do
-      1 -> reply "Usage: `!link <twitch username>"
+      1 -> reply "Usage: `!link <twitch username>`"
       _ ->
         [_ | [twitch_account | _]] = msg.content |> String.split
         twitch_account = twitch_account |> String.downcase
