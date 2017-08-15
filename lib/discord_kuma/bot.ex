@@ -277,7 +277,7 @@ defmodule DiscordKuma.Bot do
                         "Congrats, you won #{payout} coins!"
                     end
 
-                    reply "[#{col1} #{col2} #{col3}] #{result}"
+                    reply "#{col1} #{col2} #{col3}\n#{result}"
                 end
             end
           :error -> reply "Usage: !slots <bet>, where <bet> is a number between 1 and 25."
