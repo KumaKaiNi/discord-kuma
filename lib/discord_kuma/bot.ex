@@ -227,7 +227,61 @@ defmodule DiscordKuma.Bot do
   end
 
   def slot_machine(msg) do
-    reply "Not yet!"
+    case msg.content |> String.split |> length do
+      1 -> reply "Usage: `!slots <1-25>`"
+      _ ->
+        [_ | [bet | _]] = msg.content |> String.split
+        bet = bet |> Integer.parse
+
+        case bet do
+          {bet, _} ->
+            cond do
+              bet > 25  -> reply "You must bet between 1 and 25 coins."
+              bet < 1   -> reply "You must bet between 1 and 25 coins."
+              true ->
+                bank = query_data(:bank, message.user.nick)
+
+                cond do
+                  bank < bet -> reply "You do not have enough coins."
+                  true ->
+                    reel = ["⚓", "💎", "🍋", "🍊", "🍒", "🌸"]
+
+                    {col1, col2, col3} = {Enum.random(reel), Enum.random(reel), Enum.random(reel)}
+
+                    bonus = case {col1, col2, col3} do
+                      {"🌸", "🌸", _}    -> 1
+                      {"🌸", _, "🌸"}    -> 1
+                      {_, "🌸", "🌸"}    -> 1
+                      {"🌸", "🌸", "💎"} -> 2
+                      {"🌸", "💎", "🌸"} -> 2
+                      {"💎", "🌸", "🌸"} -> 2
+                      {"🍒", "🍒", "🍒"} -> 4
+                      {"🍊", "🍊", "🍊"} -> 6
+                      {"🍋", "🍋", "🍋"} -> 8
+                      {"⚓", "⚓", "⚓"} -> 10
+                      _ -> 0
+                    end
+
+                    reply "#{col1} #{col2} #{col3}"
+
+                    case bonus do
+                      0 ->
+                        store_data(:bank, message.user.nick, bank - bet)
+
+                        kuma = query_data(:bank, "kumakaini")
+                        store_data(:bank, "kumakaini", kuma + bet)
+
+                        reply "Sorry, you didn't win anything."
+                      bonus ->
+                        payout = bet * bonus
+                        store_data(:bank, message.user.nick, bank - bet + payout)
+                        reply "Congrats, you won #{payout} coins!"
+                    end
+                end
+            end
+          :error -> reply "Usage: !slots <bet>, where <bet> is a number between 1 and 25."
+        end
+    end
   end
 
   def buy_lottery_ticket(msg) do

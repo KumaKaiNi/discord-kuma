@@ -13,6 +13,19 @@ defmodule DiscordKuma.Util do
   def one_to(n), do: Enum.random(1..n) <= 1
   def percent(n), do: Enum.random(1..100) <= n
 
+  def pay_user(user, n) do
+    bonus = query_data(:casino, :bonus)
+    bank = query_data(:bank, user)
+    earnings = n * bonus
+
+    coins = case bank do
+      nil -> earnings
+      bank -> bank + earnings
+    end
+
+    store_data(:bank, user, coins)
+  end
+
   def danbooru(tag1, tag2) do
     dan = "danbooru.donmai.us"
     blacklist = ["what", "scat", "guro", "gore", "loli", "shota"]
