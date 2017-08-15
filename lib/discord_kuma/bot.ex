@@ -5,26 +5,36 @@ defmodule DiscordKuma.Bot do
   # Enforcers
   def admin(msg) do
     guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
-    user_id = msg.author.id
-    {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
-    rekyuu_id = 107977662680571904
 
-    db = query_data("guilds", guild_id)
+    case guild_id do
+      nil -> false
+      guild_id ->
+        user_id = msg.author.id
+        {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
+        rekyuu_id = 107977662680571904
 
-    is_admin = cond do
-      db == nil -> false
-      db.admin_roles == [] -> false
-      true -> Enum.member?(for role <- member["roles"] do
-        {role_id, _} = role |> Integer.parse
-        Enum.member?(db.admin_roles, role_id)
-      end, true)
+        db = query_data("guilds", guild_id)
+
+        is_admin = cond do
+          db == nil -> false
+          db.admin_roles == [] -> false
+          true -> Enum.member?(for role <- member["roles"] do
+            {role_id, _} = role |> Integer.parse
+            Enum.member?(db.admin_roles, role_id)
+          end, true)
+        end
+
+        cond do
+          is_admin -> true
+          msg.author.id == rekyuu_id -> true
+          true -> false
+        end
     end
+  end
 
-    cond do
-      is_admin -> true
-      msg.author.id == rekyuu_id -> true
-      true -> false
-    end
+  def dm(msg) do
+    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+    guild_id == nil
   end
 
   def nsfw(msg) do
