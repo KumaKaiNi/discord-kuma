@@ -5,6 +5,7 @@ defmodule DiscordKuma.Bot do
   # Enforcers
   def admin(msg) do
     user_id = msg.author.id
+    rekyuu_id = 107977662680571904
 
     cond do
       user_id == rekyuu_id -> true
@@ -15,7 +16,6 @@ defmodule DiscordKuma.Bot do
           nil -> false
           guild_id ->
             {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
-            rekyuu_id = 107977662680571904
 
             db = query_data("guilds", guild_id)
 
