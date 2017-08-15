@@ -191,7 +191,7 @@ defmodule DiscordKuma.Bot do
           Enum.member?(all_users, twitch_account) ->
             reply "That username has already been taken."
           true ->
-            all_users = all_users ++ [twitch_account] -- [user]
+            all_users = (all_users -- [user]) ++ [twitch_account]
             store_data(:links, user_id, twitch_account)
             store_data(:links, :users, all_users)
             reply "Twitch account updated!"
