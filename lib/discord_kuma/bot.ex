@@ -71,6 +71,9 @@ defmodule DiscordKuma.Bot do
 
     enforce :dm do
       match "!link", :link_twitch_account
+      match "!coins", :coins
+      match "!slots", :slot_machine
+      match "!lottery", :buy_lottery_ticket
     end
 
     enforce :admin do
@@ -203,6 +206,31 @@ defmodule DiscordKuma.Bot do
             end
         end
     end
+  end
+
+  def coins(msg) do
+    username = query_data(:links, msg.author.id)
+
+    case username do
+      nil -> reply "Be sure to link your account first."
+      username ->
+        bank = query_data(:bank, username)
+
+        amount = case bank do
+          nil -> "no"
+          bank -> bank
+        end
+
+        reply "You have #{amount} coins."
+    end
+  end
+
+  def slot_machine(msg) do
+    reply "Not yet!"
+  end
+
+  def buy_lottery_ticket(msg) do
+    reply "Not yet!"
   end
 
   # Rate limited user commands
