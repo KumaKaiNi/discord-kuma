@@ -56,6 +56,7 @@ defmodule DiscordKuma.Bot do
     match "!guidance", :souls_message
     match "!quote", :get_quote
     match "!safe", :safebooru
+    match "!jackpot", :get_jackpot
     match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
     match_all :custom_command
 
@@ -235,6 +236,11 @@ defmodule DiscordKuma.Bot do
 
   # Rate limited user commands
   def help(msg), do: reply "https://github.com/KumaKaiNi/discord-kuma"
+
+  def get_jackpot(msg) do
+    jackpot = query_data(:bank, "kumakaini")
+    reply "There are #{jackpot} coins in the jackpot."
+  end
 
   def avatar(msg) do
     user = msg.mentions |> List.first
