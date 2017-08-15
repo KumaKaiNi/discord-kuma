@@ -239,7 +239,8 @@ defmodule DiscordKuma.Bot do
               bet > 25  -> reply "You must bet between 1 and 25 coins."
               bet < 1   -> reply "You must bet between 1 and 25 coins."
               true ->
-                bank = query_data(:bank, message.user.nick)
+                username = query_data(:links, msg.author.id)
+                bank = query_data(:bank, username)
 
                 cond do
                   bank < bet -> reply "You do not have enough coins."
@@ -266,7 +267,7 @@ defmodule DiscordKuma.Bot do
 
                     case bonus do
                       0 ->
-                        store_data(:bank, message.user.nick, bank - bet)
+                        store_data(:bank, username, bank - bet)
 
                         kuma = query_data(:bank, "kumakaini")
                         store_data(:bank, "kumakaini", kuma + bet)
@@ -274,7 +275,7 @@ defmodule DiscordKuma.Bot do
                         reply "Sorry, you didn't win anything."
                       bonus ->
                         payout = bet * bonus
-                        store_data(:bank, message.user.nick, bank - bet + payout)
+                        store_data(:bank, username, bank - bet + payout)
                         reply "Congrats, you won #{payout} coins!"
                     end
                 end
