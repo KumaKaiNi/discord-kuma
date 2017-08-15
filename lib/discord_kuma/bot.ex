@@ -263,9 +263,7 @@ defmodule DiscordKuma.Bot do
                       _ -> 0
                     end
 
-                    reply "#{col1} #{col2} #{col3}"
-
-                    case bonus do
+                    result = case bonus do
                       0 ->
                         store_data(:bank, username, bank - bet)
 
@@ -278,6 +276,8 @@ defmodule DiscordKuma.Bot do
                         store_data(:bank, username, bank - bet + payout)
                         reply "Congrats, you won #{payout} coins!"
                     end
+
+                    reply "[#{col1} #{col2} #{col3}] #{result}"
                 end
             end
           :error -> reply "Usage: !slots <bet>, where <bet> is a number between 1 and 25."
