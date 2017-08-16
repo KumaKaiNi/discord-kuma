@@ -488,17 +488,22 @@ defmodule DiscordKuma.Bot do
   end
 
   def get_top_five(msg) do
-    users = query_all_data(:bank)
+    users = query_all_data(:stats)
 
-    top5 = for {username, coins} <- users do
+    top5 = for {username, stats} <- users do
       unless Enum.member?(["rekyuus", "kumakaini", "nightbot"], username) do
-        {coins, username}
+        {stats.level, username}
       end
     end |> Enum.sort |> Enum.reverse |> Enum.take(5)
 
-    top5_strings = for x <- 0..4 do
-      {:ok, {coins, username}} = Enum.fetch(top5, x)
-      "#{x + 1}. #{username} (#{coins})"
+    top5_length = cond do
+      length(top5) < 5 -> length(top5) - 1
+      true -> 4
+    end
+
+    top5_strings = for x <- 0..top5_length do
+      {:ok, {level, username}} = Enum.fetch(top5, x)
+      "#{x + 1}. #{username} (Level #{level})"
     end
 
     leaderboard = top5_strings |> Enum.join("\n")
