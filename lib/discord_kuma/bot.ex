@@ -427,7 +427,7 @@ defmodule DiscordKuma.Bot do
                 end
 
                 case stats do
-                  :error -> reply "That is not a valid stat."
+                  :error -> reply "That is not a valid stat. Valid stats are `vit`, `end`, `str`, `dex`, `int`, `luck`."
                   stats ->
                     stats = %{stats | level: next_lvl}
 
