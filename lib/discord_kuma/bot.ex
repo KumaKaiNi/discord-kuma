@@ -457,7 +457,7 @@ defmodule DiscordKuma.Bot do
         reply [content: "", embed: %Nostrum.Struct.Embed{
           color: 0x00b6b6,
           title: "#{msg.author.username}'s Stats",
-          description: "Level #{stats.level}"
+          description: "Level #{stats.level}",
           fields: [
             %{name: "Vitality", value: "#{stats.vit}", inline: true},
             %{name: "Endurance", value: "#{stats.end}", inline: true},
