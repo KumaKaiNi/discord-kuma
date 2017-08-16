@@ -275,7 +275,7 @@ defmodule DiscordKuma.Bot do
                           0 ->
                             stats = query_data(:stats, username)
                             odds =
-                              :math.pow(1250 * 1.02256518256, -1 * stats.luck)
+                              1250 * :math.pow(1.02256518256, -1 * stats.luck)
                               |> round
 
                             if one_to(odds) do
