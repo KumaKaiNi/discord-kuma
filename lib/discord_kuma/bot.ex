@@ -448,6 +448,11 @@ defmodule DiscordKuma.Bot do
       nil -> reply "Be sure to `!link` your Twitch account first."
       username ->
         bank = query_data(:bank, username)
+        bank = case bank do
+          nil -> 0
+          bank -> bank
+        end
+
         stats = query_data(:stats, username)
         stats = case stats do
           nil -> %{level: 1, vit: 10, end: 10, str: 10, dex: 10, int: 10, luck: 10}
