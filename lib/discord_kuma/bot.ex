@@ -472,7 +472,7 @@ defmodule DiscordKuma.Bot do
             %{name: "Luck", value: "#{stats.luck}", inline: true}
           ],
           thumbnail: %Nostrum.Struct.Embed.Image{url: avatar},
-          footer: "#{next_lvl_cost} coins required to level up. Direct message KumaKaiNi !level for more information."
+          footer: %{text: "#{next_lvl_cost} coins required to level up. Direct message KumaKaiNi !level for more information."}
         }]
     end
   end
