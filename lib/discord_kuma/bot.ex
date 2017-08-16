@@ -466,7 +466,7 @@ defmodule DiscordKuma.Bot do
           description: "Level #{stats.level}",
           fields: [
             %{name: "Coins", value: "#{bank}", inline: true},
-            %{name: "Next Level", value: "#{next_lvl_cost} Coins", inline: true},
+            %{name: "Level Up Cost", value: "#{next_lvl_cost}", inline: true},
             %{name: "Vitality", value: "#{stats.vit}", inline: true},
             %{name: "Endurance", value: "#{stats.end}", inline: true},
             %{name: "Strength", value: "#{stats.str}", inline: true},
