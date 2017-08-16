@@ -379,7 +379,7 @@ defmodule DiscordKuma.Bot do
     users = query_all_data(:bank)
 
     top10 = for {username, coins} <- users do
-      unless Enum.member?(["kumakaini", "nightbot"], username) do
+      unless Enum.member?(["rekyuus", "kumakaini", "nightbot"], username) do
         {coins, username}
       end
     end |> Enum.sort |> Enum.reverse |> Enum.take(10)
