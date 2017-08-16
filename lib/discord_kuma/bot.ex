@@ -453,6 +453,10 @@ defmodule DiscordKuma.Bot do
           stats -> stats
         end
 
+        next_lvl = stats.level + 1
+        next_lvl_cost =
+          :math.pow((3.741657388 * next_lvl), 2) + (100 * next_lvl) |> round
+
         avatar = "https://cdn.discordapp.com/avatars/#{msg.author.id}/#{msg.author.avatar}"
 
         reply [content: "", embed: %Nostrum.Struct.Embed{
@@ -467,7 +471,8 @@ defmodule DiscordKuma.Bot do
             %{name: "Intelligence", value: "#{stats.int}", inline: true},
             %{name: "Luck", value: "#{stats.luck}", inline: true}
           ],
-          thumbnail: %Nostrum.Struct.Embed.Image{url: avatar}
+          thumbnail: %Nostrum.Struct.Embed.Image{url: avatar},
+          footer: "#{next_lvl_cost} coins required to level up. Direct message KumaKaiNi !level for more information."
         }]
     end
   end
