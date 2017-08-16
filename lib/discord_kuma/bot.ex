@@ -452,7 +452,7 @@ defmodule DiscordKuma.Bot do
           stats -> stats
         end
 
-        avatar = "https://cdn.discordapp.com/avatars/#{msg.author.id}/#{msg.author.avatar}?size=1024"
+        avatar = "https://cdn.discordapp.com/avatars/#{msg.author.id}/#{msg.author.avatar}"
 
         reply [content: "", embed: %Nostrum.Struct.Embed{
           color: 0x00b6b6,
