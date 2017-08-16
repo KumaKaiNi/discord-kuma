@@ -57,6 +57,7 @@ defmodule DiscordKuma.Bot do
     match "!quote", :get_quote
     match "!safe", :safebooru
     match "!jackpot", :get_jackpot
+    match "!top10", :get_top_ten
     match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
     match_all :custom_command
 
@@ -372,6 +373,22 @@ defmodule DiscordKuma.Bot do
   def get_jackpot(msg) do
     jackpot = query_data(:bank, "kumakaini")
     reply "There are #{jackpot} coins in the jackpot."
+  end
+
+  def get_top_ten(msg) do
+    users = query_all_data(:bank)
+
+    top10 = for {username, coins} <- users do
+      {coins, username}
+    end |> Enum.sort |> Enum.reverse |> Enum.take(10)
+
+    top10_strings = for x <- 0..9 do
+      {:ok, {coins, username}} = Enum.fetch(top10, x)
+      "#{x + 1}. #{username} (#{coins})"
+    end
+
+    leaderboard = top10_strings |> Enum.join("\n")
+    reply "#{leaderboard}"
   end
 
   def avatar(msg) do
