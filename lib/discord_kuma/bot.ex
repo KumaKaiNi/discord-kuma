@@ -74,6 +74,7 @@ defmodule DiscordKuma.Bot do
     enforce :dm do
       match "!link", :link_twitch_account
       match "!coins", :coins
+      match "!level", :level_up
       match "!slots", :slot_machine
       match "!lottery", :buy_lottery_ticket
     end
@@ -232,7 +233,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> "Be sure to `!link` your Twitch account first."
+      nil -> reply "Be sure to `!link` your Twitch account first."
       username ->
         case msg.content |> String.split |> length do
           1 -> reply "Usage: `!slots <1-25>`"
@@ -296,7 +297,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> "Be sure to `!link` your Twitch account first."
+      nil -> reply "Be sure to `!link` your Twitch account first."
       username ->
         ticket = query_data(:lottery, username)
 
@@ -365,6 +366,77 @@ defmodule DiscordKuma.Bot do
     end
 
     reply (ticket_string ++ response) |> Enum.join("\n")
+  end
+
+  # Leveling
+  def level_up(msg) do
+    username = query_data(:links, msg.author.id)
+
+    case username do
+      nil -> reply "Be sure to `!link` your Twitch account first."
+      username ->
+        case msg.content |> String.split |> length do
+          1 ->
+            stats = query_data(:stats, username)
+
+            stats = case stats do
+              nil -> %{level: 1, vit: 10, end: 10, str: 10, dex: 10, int: 10, luck: 10}
+              stats -> stats
+            end
+
+            next_lvl = stats.level + 1
+            next_lvl_cost =
+              :math.pow((3.741657388 * next_lvl), 2) + (100 * next_lvl) |> round
+
+            reply "You are Level #{stats.level}. It will cost #{next_lvl_cost} coins to level up. Type !level <stat> to do so."
+          _ ->
+            [_ | [stat | _]] = msg.content |> String.split
+            stats = query_data(:stats, username)
+            bank = query_data(:bank, username)
+
+            stats = case stats do
+              nil -> %{level: 1, vit: 10, end: 10, str: 10, dex: 10, int: 10, luck: 10}
+              stats -> stats
+            end
+
+            next_lvl = stats.level + 1
+            next_lvl_cost =
+              :math.pow((3.741657388 * next_lvl), 2) + (100 * next_lvl) |> round
+
+            cond do
+              next_lvl_cost > bank -> reply "You do not have enough coins. #{next_lvl_cost} coins are required."
+              true ->
+                stat = case stat do
+                  "vit" -> "vitality"
+                  "end" -> "endurance"
+                  "str" -> "strength"
+                  "dex" -> "dexterity"
+                  "int" -> "intelligence"
+                  stat -> stat
+                end
+
+                stats = case stat do
+                  "vitality"      -> %{stats | vit: stats.vit + 1}
+                  "endurance"     -> %{stats | end: stats.end + 1}
+                  "strength"      -> %{stats | str: stats.str + 1}
+                  "dexterity"     -> %{stats | dex: stats.dex + 1}
+                  "intelligence"  -> %{stats | int: stats.int + 1}
+                  "luck"          -> %{stats | luck: stats.luck + 1}
+                  _ -> :error
+                end
+
+                case stats do
+                  :error -> reply "That is not a valid stat."
+                  stats ->
+                    stats = %{stats | level: next_lvl}
+
+                    store_data(:bank, username, bank - next_lvl_cost)
+                    store_data(:stats, username, stats)
+                    reply "You are now Level #{stats.level}! You have #{bank - next_lvl_cost} coins left."
+                end
+            end
+        end
+    end
   end
 
   # Rate limited user commands
