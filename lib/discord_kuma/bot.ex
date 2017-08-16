@@ -271,11 +271,6 @@ defmodule DiscordKuma.Bot do
                           _ -> 0
                         end
 
-                        bonus = case bonus do
-                          0 ->
-                          bonus -> bonus
-                        end
-
                         result = case bonus do
                           0 ->
                             stats = query_data(:stats, username)
