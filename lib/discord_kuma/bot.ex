@@ -274,7 +274,8 @@ defmodule DiscordKuma.Bot do
                         result = case bonus do
                           0 ->
                             stats = query_data(:stats, username)
-                            odds = round((100 / stats.luck) * 100)
+                            odds =
+                              round(1250 * 1.02256518256 ^ (-1 * stats.luck))
 
                             if one_to(odds) do
                               "You didn't win, but the machine gave you your money back."
