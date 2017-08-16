@@ -379,6 +379,7 @@ defmodule DiscordKuma.Bot do
         case msg.content |> String.split |> length do
           1 ->
             stats = query_data(:stats, username)
+            bank = query_data(:bank, username)
 
             stats = case stats do
               nil -> %{level: 1, vit: 10, end: 10, str: 10, dex: 10, int: 10, luck: 10}
@@ -389,7 +390,7 @@ defmodule DiscordKuma.Bot do
             next_lvl_cost =
               :math.pow((3.741657388 * next_lvl), 2) + (100 * next_lvl) |> round
 
-            reply "You are Level #{stats.level}. It will cost #{next_lvl_cost} coins to level up. Type `!level <stat>` to do so."
+            reply "You are Level #{stats.level}. It will cost #{next_lvl_cost} coins to level up. You currently have #{bank} coins. Type `!level <stat>` to do so."
           _ ->
             [_ | [stat | _]] = msg.content |> String.split
             stats = query_data(:stats, username)
@@ -405,7 +406,7 @@ defmodule DiscordKuma.Bot do
               :math.pow((3.741657388 * next_lvl), 2) + (100 * next_lvl) |> round
 
             cond do
-              next_lvl_cost > bank -> reply "You do not have enough coins. #{next_lvl_cost} coins are required."
+              next_lvl_cost > bank -> reply "You do not have enough coins. #{next_lvl_cost} coins are required. You currently have #{bank} coins."
               true ->
                 stat = case stat do
                   "vit" -> "vitality"
