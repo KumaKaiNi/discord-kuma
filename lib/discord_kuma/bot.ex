@@ -213,7 +213,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> reply "Be sure to link your account first."
+      nil -> reply "Be sure to `!link` your Twitch account first."
       username ->
         bank = query_data(:bank, username)
 
@@ -240,44 +240,48 @@ defmodule DiscordKuma.Bot do
               bet < 1   -> reply "You must bet between 1 and 25 coins."
               true ->
                 username = query_data(:links, msg.author.id)
-                bank = query_data(:bank, username)
+                case username do
+                  nil -> "Be sure to `!link` your Twitch account first."
+                  username ->
+                  bank = query_data(:bank, username)
 
-                cond do
-                  bank < bet -> reply "You do not have enough coins."
-                  true ->
-                    reel = ["⚓", "💎", "🍋", "🍊", "🍒", "🌸"]
+                  cond do
+                    bank < bet -> reply "You do not have enough coins."
+                    true ->
+                      reel = ["⚓", "💎", "🍋", "🍊", "🍒", "🌸"]
 
-                    {col1, col2, col3} = {Enum.random(reel), Enum.random(reel), Enum.random(reel)}
+                      {col1, col2, col3} = {Enum.random(reel), Enum.random(reel), Enum.random(reel)}
 
-                    bonus = case {col1, col2, col3} do
-                      {"🌸", "🌸", _}    -> 1
-                      {"🌸", _, "🌸"}    -> 1
-                      {_, "🌸", "🌸"}    -> 1
-                      {"🌸", "🌸", "💎"} -> 2
-                      {"🌸", "💎", "🌸"} -> 2
-                      {"💎", "🌸", "🌸"} -> 2
-                      {"🍒", "🍒", "🍒"} -> 4
-                      {"🍊", "🍊", "🍊"} -> 6
-                      {"🍋", "🍋", "🍋"} -> 8
-                      {"⚓", "⚓", "⚓"} -> 10
-                      _ -> 0
-                    end
+                      bonus = case {col1, col2, col3} do
+                        {"🌸", "🌸", _}    -> 1
+                        {"🌸", _, "🌸"}    -> 1
+                        {_, "🌸", "🌸"}    -> 1
+                        {"🌸", "🌸", "💎"} -> 2
+                        {"🌸", "💎", "🌸"} -> 2
+                        {"💎", "🌸", "🌸"} -> 2
+                        {"🍒", "🍒", "🍒"} -> 4
+                        {"🍊", "🍊", "🍊"} -> 6
+                        {"🍋", "🍋", "🍋"} -> 8
+                        {"⚓", "⚓", "⚓"} -> 10
+                        _ -> 0
+                      end
 
-                    result = case bonus do
-                      0 ->
-                        store_data(:bank, username, bank - bet)
+                      result = case bonus do
+                        0 ->
+                          store_data(:bank, username, bank - bet)
 
-                        kuma = query_data(:bank, "kumakaini")
-                        store_data(:bank, "kumakaini", kuma + bet)
+                          kuma = query_data(:bank, "kumakaini")
+                          store_data(:bank, "kumakaini", kuma + bet)
 
-                        "Sorry, you didn't win anything."
-                      bonus ->
-                        payout = bet * bonus
-                        store_data(:bank, username, bank - bet + payout)
-                        "Congrats, you won #{payout} coins!"
-                    end
+                          "Sorry, you didn't win anything."
+                        bonus ->
+                          payout = bet * bonus
+                          store_data(:bank, username, bank - bet + payout)
+                          "Congrats, you won #{payout} coins!"
+                      end
 
-                    reply "#{col1} #{col2} #{col3}\n#{result}"
+                      reply "#{col1} #{col2} #{col3}\n#{result}"
+                  end
                 end
             end
           :error -> reply "Usage: !slots <bet>, where <bet> is a number between 1 and 25."
