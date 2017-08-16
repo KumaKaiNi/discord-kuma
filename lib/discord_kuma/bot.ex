@@ -335,7 +335,7 @@ defmodule DiscordKuma.Bot do
   def lottery_drawing(msg) do
     winning_ticket = "#{Enum.random(0..9)} #{Enum.random(0..9)} #{Enum.random(0..9)}"
 
-    reply "The winning numbers today are #{winning_ticket}!"
+    ticket_string = ["The winning numbers today are #{winning_ticket}!"]
 
     winners = for {username, ticket} <- query_all_data(:lottery) do
       delete_data(:lottery, username)
@@ -363,7 +363,7 @@ defmodule DiscordKuma.Bot do
         winner_strings ++ ["Congratulations!!"]
     end
 
-    reply response |> Enum.join("\n")
+    reply (ticket_string ++ response) |> Enum.join("\n")
   end
 
   # Rate limited user commands
