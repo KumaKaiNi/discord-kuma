@@ -447,6 +447,7 @@ defmodule DiscordKuma.Bot do
     case username do
       nil -> reply "Be sure to `!link` your Twitch account first."
       username ->
+        bank = query_data(:bank, username)
         stats = query_data(:stats, username)
         stats = case stats do
           nil -> %{level: 1, vit: 10, end: 10, str: 10, dex: 10, int: 10, luck: 10}
@@ -464,6 +465,8 @@ defmodule DiscordKuma.Bot do
           title: "#{msg.author.username}'s Stats",
           description: "Level #{stats.level}",
           fields: [
+            %{name: "Coins", value: "#{bank}", inline: true},
+            %{name: "Next Level", value: "#{next_lvl_cost} Coins", inline: true},
             %{name: "Vitality", value: "#{stats.vit}", inline: true},
             %{name: "Endurance", value: "#{stats.end}", inline: true},
             %{name: "Strength", value: "#{stats.str}", inline: true},
@@ -471,8 +474,7 @@ defmodule DiscordKuma.Bot do
             %{name: "Intelligence", value: "#{stats.int}", inline: true},
             %{name: "Luck", value: "#{stats.luck}", inline: true}
           ],
-          thumbnail: %Nostrum.Struct.Embed.Image{url: avatar},
-          footer: %{text: "#{next_lvl_cost} coins for Level #{next_lvl}"}
+          thumbnail: %Nostrum.Struct.Embed.Image{url: avatar}
         }]
     end
   end
