@@ -494,7 +494,8 @@ defmodule DiscordKuma.Bot do
       unless Enum.member?(["rekyuus", "kumakaini", "nightbot"], username) do
         {stats.level, username}
       end
-    end |> Enum.sort |> Enum.reverse |> Enum.take(5)
+    end |> Enum.sort |> Enum.reverse |> Enum.take(5) |> Enum.uniq
+    top5 = top5 -- [nil]
 
     top5_length = cond do
       length(top5) < 5 -> length(top5) - 1
