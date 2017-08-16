@@ -349,20 +349,21 @@ defmodule DiscordKuma.Bot do
     jackpot = query_data(:bank, "kumakaini")
     winners = Enum.uniq(winners) -- [nil]
 
-    case length(winners) do
-      0 -> reply "There are no winners today."
+    response = case length(winners) do
+      0 -> ["There are no winners today."]
       _ ->
         winnings = jackpot / length(winners) |> round
 
-        for winner <- winners do
+        winner_strings = for winner <- winners do
           pay_user(winner, winnings)
-          reply "#{winner} has won #{winnings} coins!"
+          "#{winner} has won #{winnings} coins!"
         end
 
-        reply "Congratulations!!"
-
         store_data(:bank, "kumakaini", 0)
+        winner_strings ++ ["Congratulations!!"]
     end
+
+    reply response |> Enum.join("\n")
   end
 
   # Rate limited user commands
