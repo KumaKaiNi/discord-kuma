@@ -340,11 +340,14 @@ defmodule DiscordKuma.Bot do
     winners = for {username, ticket} <- query_all_data(:lottery) do
       delete_data(:lottery, username)
 
-      if ticket == winning_ticket, do: username
+      cond do
+        ticket == winning_ticket -> username
+        true -> nil
+      end
     end
 
     jackpot = query_data(:bank, "kumakaini")
-    winners = Enum.uniq(winners)
+    winners = Enum.uniq(winners) -- [nil]
 
     case length(winners) do
       0 -> reply "There are no winners today."
