@@ -253,7 +253,7 @@ defmodule DiscordKuma.Bot do
                     cond do
                       bank < bet -> reply "You do not have enough coins."
                       true ->
-                        reel = ["⚓", "💎", "🍋", "🍊", "🍒", "🌸"]
+                        reel = ["⚓", "⭐", "🍋", "🍊", "🍒", "🌸"]
 
                         {col1, col2, col3} = {Enum.random(reel), Enum.random(reel), Enum.random(reel)}
 
@@ -261,9 +261,9 @@ defmodule DiscordKuma.Bot do
                           {"🌸", "🌸", _}    -> 1
                           {"🌸", _, "🌸"}    -> 1
                           {_, "🌸", "🌸"}    -> 1
-                          {"🌸", "🌸", "💎"} -> 2
-                          {"🌸", "💎", "🌸"} -> 2
-                          {"💎", "🌸", "🌸"} -> 2
+                          {"🌸", "🌸", "⭐"} -> 2
+                          {"🌸", "⭐", "🌸"} -> 2
+                          {"⭐", "🌸", "🌸"} -> 2
                           {"🍒", "🍒", "🍒"} -> 4
                           {"🍊", "🍊", "🍊"} -> 6
                           {"🍋", "🍋", "🍋"} -> 8
@@ -271,14 +271,26 @@ defmodule DiscordKuma.Bot do
                           _ -> 0
                         end
 
+                        bonus = case bonus do
+                          0 ->
+                          bonus -> bonus
+                        end
+
                         result = case bonus do
                           0 ->
-                            store_data(:bank, username, bank - bet)
+                            stats = query_data(:stats, username)
+                            odds = round((100 / stats.luck) * 100)
 
-                            kuma = query_data(:bank, "kumakaini")
-                            store_data(:bank, "kumakaini", kuma + bet)
+                            if one_to(odds) do
+                              "You didn't win, but the machine gave you your money back."
+                            else
+                              store_data(:bank, username, bank - bet)
 
-                            "Sorry, you didn't win anything."
+                              kuma = query_data(:bank, "kumakaini")
+                              store_data(:bank, "kumakaini", kuma + bet)
+
+                              "Sorry, you didn't win anything."
+                            end
                           bonus ->
                             payout = bet * bonus
                             store_data(:bank, username, bank - bet + payout)
