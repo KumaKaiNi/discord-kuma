@@ -390,9 +390,7 @@ defmodule DiscordKuma.Bot do
     end
 
     leaderboard = top10_strings |> Enum.join("\n")
-    reply "```
-    #{leaderboard}
-    ```"
+    reply "```\n#{leaderboard}\n```"
   end
 
   def avatar(msg) do
