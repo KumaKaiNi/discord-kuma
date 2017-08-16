@@ -379,7 +379,9 @@ defmodule DiscordKuma.Bot do
     users = query_all_data(:bank)
 
     top10 = for {username, coins} <- users do
-      {coins, username}
+      unless Enum.member?(["kumakaini", "nightbot"], username) do
+        {coins, username}
+      end
     end |> Enum.sort |> Enum.reverse |> Enum.take(10)
 
     top10_strings = for x <- 0..9 do
@@ -388,7 +390,9 @@ defmodule DiscordKuma.Bot do
     end
 
     leaderboard = top10_strings |> Enum.join("\n")
-    reply "#{leaderboard}"
+    reply "```
+    #{leaderboard}
+    ```"
   end
 
   def avatar(msg) do
