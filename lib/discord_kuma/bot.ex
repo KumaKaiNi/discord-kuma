@@ -388,7 +388,7 @@ defmodule DiscordKuma.Bot do
             next_lvl_cost =
               :math.pow((3.741657388 * next_lvl), 2) + (100 * next_lvl) |> round
 
-            reply "You are Level #{stats.level}. It will cost #{next_lvl_cost} coins to level up. Type !level <stat> to do so."
+            reply "You are Level #{stats.level}. It will cost #{next_lvl_cost} coins to level up. Type `!level <stat>` to do so."
           _ ->
             [_ | [stat | _]] = msg.content |> String.split
             stats = query_data(:stats, username)
@@ -436,6 +436,37 @@ defmodule DiscordKuma.Bot do
                 end
             end
         end
+    end
+  end
+
+  def get_stats(msg) do
+    username = query_data(:links, msg.author.id)
+
+    case username do
+      nil -> reply "Be sure to `!link` your Twitch account first."
+      username ->
+        stats = query_data(:stats, username)
+        stats = case stats do
+          nil -> %{level: 1, vit: 10, end: 10, str: 10, dex: 10, int: 10, luck: 10}
+          stats -> stats
+        end
+
+        avatar = "https://cdn.discordapp.com/avatars/#{msg.author.id}/#{msg.author.avatar}?size=1024"
+
+        reply [content: "", embed: %Nostrum.Struct.Embed{
+          color: 0x00b6b6,
+          title: "#{msg.author.username}'s Stats",
+          description: "Level #{stats.level}"
+          fields: [
+            %{name: "Vitality", value: "#{stats.vit}", inline: true},
+            %{name: "Endurance", value: "#{stats.end}", inline: true},
+            %{name: "Strength", value: "#{stats.str}", inline: true},
+            %{name: "Dexterity", value: "#{stats.dex}", inline: true},
+            %{name: "Intelligence", value: "#{stats.int}", inline: true},
+            %{name: "Luck", value: "#{stats.luck}", inline: true}
+          ],
+          thumbnail: %Nostrum.Struct.Embed.Image{url: avatar}
+        }]
     end
   end
 
