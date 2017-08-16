@@ -88,6 +88,7 @@ defmodule DiscordKuma.Bot do
       match "!del", :del_custom_command
       match "!addquote", :add_quote
       match "!delquote", :del_quote
+      match "!draw", :lottery_drawing
     end
   end
 
@@ -227,70 +228,138 @@ defmodule DiscordKuma.Bot do
   end
 
   def slot_machine(msg) do
-    case msg.content |> String.split |> length do
-      1 -> reply "Usage: `!slots <1-25>`"
-      _ ->
-        [_ | [bet | _]] = msg.content |> String.split
-        bet = bet |> Integer.parse
+    username = query_data(:links, msg.author.id)
 
-        case bet do
-          {bet, _} ->
-            cond do
-              bet > 25  -> reply "You must bet between 1 and 25 coins."
-              bet < 1   -> reply "You must bet between 1 and 25 coins."
-              true ->
-                username = query_data(:links, msg.author.id)
-                case username do
-                  nil -> "Be sure to `!link` your Twitch account first."
-                  username ->
-                  bank = query_data(:bank, username)
+    case username do
+      nil -> "Be sure to `!link` your Twitch account first."
+      username ->
+        case msg.content |> String.split |> length do
+          1 -> reply "Usage: `!slots <1-25>`"
+          _ ->
+            [_ | [bet | _]] = msg.content |> String.split
+            bet = bet |> Integer.parse
 
-                  cond do
-                    bank < bet -> reply "You do not have enough coins."
-                    true ->
-                      reel = ["⚓", "💎", "🍋", "🍊", "🍒", "🌸"]
+            case bet do
+              {bet, _} ->
+                cond do
+                  bet > 25  -> reply "You must bet between 1 and 25 coins."
+                  bet < 1   -> reply "You must bet between 1 and 25 coins."
+                  true ->
+                    bank = query_data(:bank, username)
 
-                      {col1, col2, col3} = {Enum.random(reel), Enum.random(reel), Enum.random(reel)}
+                    cond do
+                      bank < bet -> reply "You do not have enough coins."
+                      true ->
+                        reel = ["⚓", "💎", "🍋", "🍊", "🍒", "🌸"]
 
-                      bonus = case {col1, col2, col3} do
-                        {"🌸", "🌸", _}    -> 1
-                        {"🌸", _, "🌸"}    -> 1
-                        {_, "🌸", "🌸"}    -> 1
-                        {"🌸", "🌸", "💎"} -> 2
-                        {"🌸", "💎", "🌸"} -> 2
-                        {"💎", "🌸", "🌸"} -> 2
-                        {"🍒", "🍒", "🍒"} -> 4
-                        {"🍊", "🍊", "🍊"} -> 6
-                        {"🍋", "🍋", "🍋"} -> 8
-                        {"⚓", "⚓", "⚓"} -> 10
-                        _ -> 0
-                      end
+                        {col1, col2, col3} = {Enum.random(reel), Enum.random(reel), Enum.random(reel)}
 
-                      result = case bonus do
-                        0 ->
-                          store_data(:bank, username, bank - bet)
+                        bonus = case {col1, col2, col3} do
+                          {"🌸", "🌸", _}    -> 1
+                          {"🌸", _, "🌸"}    -> 1
+                          {_, "🌸", "🌸"}    -> 1
+                          {"🌸", "🌸", "💎"} -> 2
+                          {"🌸", "💎", "🌸"} -> 2
+                          {"💎", "🌸", "🌸"} -> 2
+                          {"🍒", "🍒", "🍒"} -> 4
+                          {"🍊", "🍊", "🍊"} -> 6
+                          {"🍋", "🍋", "🍋"} -> 8
+                          {"⚓", "⚓", "⚓"} -> 10
+                          _ -> 0
+                        end
 
-                          kuma = query_data(:bank, "kumakaini")
-                          store_data(:bank, "kumakaini", kuma + bet)
+                        result = case bonus do
+                          0 ->
+                            store_data(:bank, username, bank - bet)
 
-                          "Sorry, you didn't win anything."
-                        bonus ->
-                          payout = bet * bonus
-                          store_data(:bank, username, bank - bet + payout)
-                          "Congrats, you won #{payout} coins!"
-                      end
+                            kuma = query_data(:bank, "kumakaini")
+                            store_data(:bank, "kumakaini", kuma + bet)
 
-                      reply "#{col1} #{col2} #{col3}\n#{result}"
-                  end
+                            "Sorry, you didn't win anything."
+                          bonus ->
+                            payout = bet * bonus
+                            store_data(:bank, username, bank - bet + payout)
+                            "Congrats, you won #{payout} coins!"
+                        end
+
+                        reply "#{col1} #{col2} #{col3}\n#{result}"
+                    end
                 end
+              :error -> reply "Usage: !slots <bet>, where <bet> is a number between 1 and 25."
             end
-          :error -> reply "Usage: !slots <bet>, where <bet> is a number between 1 and 25."
         end
     end
   end
 
   def buy_lottery_ticket(msg) do
-    reply "Not yet!"
+    username = query_data(:links, msg.author.id)
+
+    case username do
+      nil -> "Be sure to `!link` your Twitch account first."
+      username ->
+        ticket = query_data(:lottery, username)
+
+        case ticket do
+          nil ->
+            bank = query_data(:bank, username)
+
+            cond do
+              bank < 50 -> reply "You do not have 50 coins to purchase a lottery ticket."
+              true ->
+                [_ | choices] = msg.content |> String.split
+                {_, safeguard} = choices |> Enum.join |> Integer.parse
+                numbers = choices |> Enum.join |> String.length
+
+                case safeguard do
+                  "" ->
+                    cond do
+                      length(choices) == 3 and numbers == 3 ->
+                        jackpot = query_data(:bank, "kumakaini")
+
+                        store_data(:bank, username, bank - 50)
+                        store_data(:bank, "kumakaini", jackpot + 50)
+
+                        store_data(:lottery, username, choices |> Enum.join(" "))
+
+                        reply "Your lottery ticket of #{choices |> Enum.join(" ")} has been purchased for 50 coins."
+                      true -> reply "Please send me three numbers, ranging between 0-9."
+                    end
+                  _ -> reply "Please only send me three numbers, ranging between 0-9."
+                end
+            end
+          ticket -> reply "You've already purchased a ticket of #{ticket}. Please wait for the next drawing to buy again."
+        end
+    end
+  end
+
+  def lottery_drawing(msg) do
+    winning_ticket = "#{Enum.random(0..9)} #{Enum.random(0..9)} #{Enum.random(0..9)}"
+
+    reply "The winning numbers today are #{winning_ticket}!"
+
+    winners = for {username, ticket} <- query_all_data(:lottery) do
+      delete_data(:lottery, username)
+
+      if ticket == winning_ticket, do: username
+    end
+
+    jackpot = query_data(:bank, "kumakaini")
+    winners = Enum.uniq(winners)
+
+    case length(winners) do
+      0 -> reply "There are no winners today."
+      _ ->
+        winnings = jackpot / length(winners) |> round
+
+        for winner <- winners do
+          pay_user(winner, winnings)
+          reply "#{winner} has won #{winnings} coins!"
+        end
+
+        reply "Congratulations!!"
+
+        store_data(:bank, "kumakaini", 0)
+    end
   end
 
   # Rate limited user commands
