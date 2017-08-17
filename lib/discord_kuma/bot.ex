@@ -92,6 +92,7 @@ defmodule DiscordKuma.Bot do
       match "!addquote", :add_quote
       match "!delquote", :del_quote
       match "!draw", :lottery_drawing
+      match "!giftall", :gift_all_coins
     end
   end
 
@@ -228,6 +229,18 @@ defmodule DiscordKuma.Bot do
 
         reply "You have #{amount} coins."
     end
+  end
+
+  def gift_all_coins(msg) do
+    [_ | [gift | _]] = msg.content |> String.split
+    {gift, _} = gift |> Integer.parse
+    users = query_all_data(:bank)
+
+    for {username, coins} <- users do
+      store_data(:bank, username, coins + gift)
+    end
+
+    reply "Gifted everyone #{gift} coins!"
   end
 
   def slot_machine(msg) do
