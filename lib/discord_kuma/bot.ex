@@ -439,7 +439,7 @@ defmodule DiscordKuma.Bot do
                 case stats do
                   :error -> reply "That is not a valid stat. Valid stats are `vit`, `end`, `str`, `dex`, `int`, `luck`."
                   stats ->
-                    stats = %{stats | level: next_lvl}
+                    stats = %{stats | level: stats.level + 1}
 
                     store_data(:bank, username, bank - next_lvl_cost)
                     store_data(:stats, username, stats)
