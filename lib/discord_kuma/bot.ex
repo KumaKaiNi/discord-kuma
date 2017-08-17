@@ -405,6 +405,7 @@ defmodule DiscordKuma.Bot do
       username ->
         case msg.content |> String.split |> length do
           1 ->
+            bank = query_data(:bank, username)
             {stats, next_lvl_cost} = get_user_stats(username)
 
             reply "You are Level #{stats.level}. It will cost #{next_lvl_cost} coins to level up. You currently have #{bank} coins. Type `!level <stat>` to do so."
