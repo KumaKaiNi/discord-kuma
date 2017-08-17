@@ -234,13 +234,18 @@ defmodule DiscordKuma.Bot do
   def gift_all_coins(msg) do
     [_ | [gift | _]] = msg.content |> String.split
     {gift, _} = gift |> Integer.parse
-    users = query_all_data(:bank)
 
-    for {username, coins} <- users do
-      store_data(:bank, username, coins + gift)
+    cond do
+      gift <= 0 -> reply "Please gift 1 coin or more."
+      true ->
+        users = query_all_data(:bank)
+
+        for {username, coins} <- users do
+          store_data(:bank, username, coins + gift)
+        end
+
+        reply "Gifted everyone #{gift} coins!"
     end
-
-    reply "Gifted everyone #{gift} coins!"
   end
 
   def slot_machine(msg) do
