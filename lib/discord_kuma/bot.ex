@@ -218,7 +218,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> reply "Be sure to `!link` your Twitch account first."
+      nil -> reply "You need to link your Twitch account. Be sure to DM me `!link <twitch username>` first."
       username ->
         bank = query_data(:bank, username)
 
@@ -252,7 +252,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> reply "Be sure to `!link` your Twitch account first."
+      nil -> reply "You need to link your Twitch account. Be sure to DM me `!link <twitch username>` first."
       username ->
         case msg.content |> String.split |> length do
           1 -> reply "Usage: `!slots <1-25>`"
@@ -325,7 +325,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> reply "Be sure to `!link` your Twitch account first."
+      nil -> reply "You need to link your Twitch account. Be sure to DM me `!link <twitch username>` first."
       username ->
         ticket = query_data(:lottery, username)
 
@@ -401,7 +401,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> reply "Be sure to `!link` your Twitch account first."
+      nil -> reply "You need to link your Twitch account. Be sure to DM me `!link <twitch username>` first."
       username ->
         case msg.content |> String.split |> length do
           1 ->
@@ -454,7 +454,7 @@ defmodule DiscordKuma.Bot do
     username = query_data(:links, msg.author.id)
 
     case username do
-      nil -> reply "Be sure to `!link` your Twitch account first."
+      nil -> reply "You need to link your Twitch account. Be sure to DM me `!link <twitch username>` first."
       username ->
         bank = query_data(:bank, username)
         bank = case bank do
