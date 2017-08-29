@@ -21,7 +21,7 @@ defmodule DiscordKuma.Commands.Quote do
         end
     end
 
-    reply "[\##{quote_id}] #{quote_text}"
+    reply "[#{quote_id}] #{quote_text}"
   end
 
   def add_quote(msg) do
@@ -50,7 +50,7 @@ defmodule DiscordKuma.Commands.Quote do
     case quote_id |> Integer.parse do
       {quote_id, _} ->
         case query_data(:quotes, quote_id) do
-          nil -> reply "Quote \##{quote_id} does not exist."
+          nil -> reply "Quote #{quote_id} does not exist."
           _ ->
             delete_data(:quotes, quote_id)
             reply "Quote removed."
