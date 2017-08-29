@@ -10,6 +10,21 @@ defmodule DiscordKuma.Commands.Image do
       image: %Nostrum.Struct.Embed.Image{url: url}
     }]
   end
+
+  def smug(msg) do
+    url = "https://api.imgur.com/3/album/zSNC1"
+    auth = %{"Authorization" => "Client-ID #{Application.get_env(:discord_kuma, :imgur_client_id)}"}
+
+    request = HTTPoison.get!(url, auth)
+    response = Poison.Parser.parse!((request.body), keys: :atoms)
+    result = response.data.images |> Enum.random
+
+    reply [content: "", embed: %Nostrum.Struct.Embed{
+      color: 0x00b6b6,
+      image: %Nostrum.Struct.Embed.Image{url: result.link}
+    }]
+  end
+
   def danbooru(msg) do
     {tag1, tag2} = case length(msg.content |> String.split) do
       1 -> {"order:rank", ""}
