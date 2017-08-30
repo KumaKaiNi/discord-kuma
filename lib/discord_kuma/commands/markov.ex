@@ -37,7 +37,7 @@ defmodule DiscordKuma.Commands.Markov do
     end
 
     Dictionary.new
-    |> Dictionary.parse(file)
+    |> Dictionary.parse(lines)
     |> Generator.generate_words(markov_start, markov_length)
   end
 end
