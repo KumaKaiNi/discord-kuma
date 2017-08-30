@@ -20,12 +20,12 @@ defmodule DiscordKuma.Commands.Markov do
         nil -> nil
         %{"username" => username, "capture" => capture} ->
           unless username == "kumakaini" do
-            link_check = capture |> String.split(":") |> List.first
+            ignore? = capture |> String.split(":") |> List.first
 
-            case link_check do
+            case ignore? do
               "http" -> nil
               "https" -> nil
-              _ -> capture
+              capture -> unless capture |> String.first == "!", do: capture
             end
           end
       end
