@@ -25,7 +25,9 @@ defmodule DiscordKuma.Commands.Markov do
     words = lines |> Enum.join(" ")
 
     markov_length = case word_count do
-      0 -> round(length(words |> String.split) / length(lines))
+      0 ->
+        average = round(length(words |> String.split) / length(lines))
+        average + :random.uniform(average)
       count -> count
     end
 
