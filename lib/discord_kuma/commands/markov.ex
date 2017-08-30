@@ -16,9 +16,11 @@ defmodule DiscordKuma.Commands.Markov do
 
     lines = file |> String.split("\n")
     lines = for line <- lines do
-      %{"capture" => capture} = Regex.named_captures(~r/(\[.*\] \w+\: )(?<capture>.*)/, line)
-      capture
-    end
+      case Regex.named_captures(~r/(\[.*\] \w+\: )(?<capture>.*)/, line) do
+        nil -> nil
+        %{"capture" => capture} -> capture
+      end
+    end |> Enum.uniq -- [nil]
 
     words = lines |> Enum.join(" ")
 
