@@ -1,5 +1,5 @@
 defmodule DiscordKuma.Commands.Markov do
-  import DiscordKuma.{Module, Util}
+  import DiscordKuma.Module
 
   def get_markov(msg) do
     reply gen_markov("/home/bowan/bots/_db/twitch.log")

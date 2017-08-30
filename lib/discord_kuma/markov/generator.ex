@@ -13,7 +13,7 @@ defmodule DiscordKuma.Markov.Generator do
   end
 
   defp get_word(dictionary, start_word) do
-    case TelegramBot.Markov.Dictionary.next(dictionary, start_word) do
+    case DiscordKuma.Markov.Dictionary.next(dictionary, start_word) do
       nil -> nil
       list -> Enum.shuffle(list) |> hd
     end

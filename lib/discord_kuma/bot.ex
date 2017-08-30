@@ -19,6 +19,7 @@ defmodule DiscordKuma.Bot do
     match "!jackpot", :get_jackpot
     match "!top5", :get_top_five
     match "!stats", :get_stats
+    match "!markov", :get_markov
     match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
     match_all :custom_command
 
