@@ -16,9 +16,17 @@ defmodule DiscordKuma.Commands.Markov do
 
     lines = file |> String.split("\n")
     lines = (for line <- lines do
-      case Regex.named_captures(~r/\[.*\].*: (?<capture>.*)/, line) do
+      case Regex.named_captures(~r/\[.*\] (?<username>.*): (?<capture>.*)/, line) do
         nil -> nil
-        %{"capture" => capture} -> capture
+        %{"username" => username, "capture" => capture} ->
+          unless username == "kumakaini" do
+            link_check = capture |> String.split(":") |> List.first
+
+            case link_check do
+              "http" -> nil
+              "https" -> nil
+              _ -> capture
+          end
       end
     end |> Enum.uniq) -- [nil]
 
