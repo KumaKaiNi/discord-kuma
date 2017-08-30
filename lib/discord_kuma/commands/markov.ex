@@ -16,7 +16,7 @@ defmodule DiscordKuma.Commands.Markov do
 
     lines = file |> String.split("\n")
     lines = for line <- lines do
-      %{"capture", capture} = Regex.named_captures(~r/(\[.*\] \w+\: )(?<capture>.*)/, line)
+      %{"capture" => capture} = Regex.named_captures(~r/(\[.*\] \w+\: )(?<capture>.*)/, line)
       capture
     end
 
