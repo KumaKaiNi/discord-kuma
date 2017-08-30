@@ -26,6 +26,7 @@ defmodule DiscordKuma.Commands.Markov do
               "http" -> nil
               "https" -> nil
               _ -> capture
+            end
           end
       end
     end |> Enum.uniq) -- [nil]
