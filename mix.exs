@@ -14,7 +14,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:nostrum, :logger, :httpoison],
+    [applications: [:discord_ex, :logger, :httpoison],
      mod: {DiscordKuma, []}
     ]
   end
@@ -29,7 +29,6 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:gun, git: "https://github.com/ninenines/gun.git", ref: "dd1bfe4d6f9fb277781d922aa8bbb5648b3e6756", override: true},
-     {:nostrum, git: "https://github.com/Kraigie/nostrum.git"}]
+    [{:discord_ex, git: "https://github.com/rmcafee/discord_ex.git"}]
   end
 end

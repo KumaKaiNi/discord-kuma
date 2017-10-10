@@ -1,20 +1,15 @@
 defmodule DiscordKuma.Module do
-  use Nostrum.Consumer
-  alias Nostrum.Api
+  alias DiscordEx.RestClient.Resources.Channel
 
   defmacro __using__(_opts) do
     quote do
       import DiscordKuma.Module
-      use Nostrum.Consumer
-      alias Nostrum.Api
-
-      def start_link, do: Consumer.start_link(__MODULE__, :state)
     end
   end
 
   defmacro handle(event, do: body) do
     quote do
-      def handle_event({unquote(event), {var!(msg)}, var!(_ws_state)}, var!(state)) do
+      def handle_event({unquote(event), var!(msg)}, var!(state)) do
         unquote(body)
 
         {:ok, var!(state)}
@@ -56,9 +51,9 @@ defmodule DiscordKuma.Module do
   defp make_match(text, body) when is_atom(body) do
     quote do
       cond do
-        var!(msg).content == unquote(text) -> unquote(body)(var!(msg))
-        var!(msg).content |> String.split |> List.first == unquote(text) ->
-          unquote(body)(var!(msg))
+        var!(msg).data["content"] == unquote(text) -> unquote(body)(var!(msg))
+        var!(msg).data["content"] |> String.split |> List.first == unquote(text) ->
+          unquote(body)(var!(msg), var!(state))
         true -> nil
       end
     end
@@ -67,8 +62,8 @@ defmodule DiscordKuma.Module do
   defp make_match(text, body) do
     quote do
       cond do
-        var!(msg).content == unquote(text) -> unquote(body)
-        var!(msg).content |> String.split |> List.first == unquote(text) ->
+        var!(msg).data["content"] == unquote(text) -> unquote(body)
+        var!(msg).data["content"] |> String.split |> List.first == unquote(text) ->
           unquote(body)
         true -> nil
       end
@@ -89,13 +84,13 @@ defmodule DiscordKuma.Module do
 
   defmacro reply(text, chan: channel_id) do
     quote do
-      Api.create_message(unquote(channel_id), unquote(text))
+      Channel.send_message(var!(state)[:rest_client], unquote(channel_id), %{content: unquote(text)})
     end
   end
 
   defmacro reply(text) do
     quote do
-      Api.create_message(var!(msg).channel_id, unquote(text))
+      Channel.send_message(var!(state)[:rest_client], var!(msg).data["channel_id"], %{content: unquote(text)})
     end
   end
 end
