@@ -8,6 +8,7 @@ defmodule DiscordKuma.Commands do
         Custom,
         General,
         Image,
+        Markov,
         Quote,
         Random,
         Stream
