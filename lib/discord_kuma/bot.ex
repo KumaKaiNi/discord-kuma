@@ -61,11 +61,7 @@ defmodule DiscordKuma.Bot do
             case :gen_tcp.recv(socket, 0) do
               {:ok, response} ->
                 case response |> Poison.Parser.parse!(keys: :atoms) do
-                  %{reply: true, message: text} ->
-                    case message.command do
-                      "WHISPER" -> Kaguya.Util.sendPM("/w #{message.user.nick} #{text}", "#jtv")
-                      "PRIVMSG" -> reply text
-                    end
+                  %{reply: true, message: text} -> reply text
                   _ -> nil
                 end
               {:error, reason} -> Logger.error "Receive error: #{reason}"
