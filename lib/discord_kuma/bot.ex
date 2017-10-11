@@ -5,15 +5,18 @@ defmodule DiscordKuma.Bot do
 
   handle :message_create do
     match "!kuma" do
+      require Logger
+
       channel = Channel.get(state[:rest_client], msg.data["channel_id"])
       guild = Guild.get(state[:rest_client], channel["guild_id"])
 
+      Logger.debug "from: #{guild["name"]} \##{channel["name"]}"
       IO.inspect msg
-      IO.inspect channel
-      IO.inspect guild
 
       reply "Kuma~!"
     end
+
+    match "!link", do: link_twitch_account(msg, state)
 
     enforce :admin do
       match "!announce here", do: set_log_channel(msg, state)
@@ -26,6 +29,41 @@ defmodule DiscordKuma.Bot do
   handle :presence_update, do: announce(msg, state)
 
   def handle_event({_event, _msg}, state), do: {:ok, state}
+
+  defp link_twitch_account(msg, state) do
+    case msg.data["content"] |> String.split |> length do
+      1 -> "Usage: `!link <twitch username>`"
+      _ ->
+        [_ | [twitch_account | _]] = msg.data["content"] |> String.split
+        twitch_account = twitch_account |> String.downcase
+
+        user = query_data(:links, msg.data["author"]["id"])
+        all_users = query_data(:links, :users)
+
+        case user do
+          nil ->
+            cond do
+              Enum.member?(all_users, twitch_account) ->
+                "That username has already been taken."
+              true ->
+                all_users = all_users ++ [twitch_account]
+                store_data(:links, msg.data["author"]["id"], twitch_account)
+                store_data(:links, :users, all_users)
+                reply "Twitch account linked!"
+            end
+          user ->
+            cond do
+              Enum.member?(all_users, twitch_account) ->
+                "That username has already been taken."
+              true ->
+                all_users = (all_users -- [user]) ++ [twitch_account]
+                store_data(:links, msg.data["author"]["id"], twitch_account)
+                store_data(:links, :users, all_users)
+                reply "Twitch account updated!"
+            end
+        end
+    end
+  end
 
   defp make_call(msg, state) do
     require Logger
@@ -65,12 +103,15 @@ defmodule DiscordKuma.Bot do
                 IO.inspect(response |> Poison.Parser.parse!(keys: :atoms))
 
                 case response |> Poison.Parser.parse!(keys: :atoms) do
-                  %{reply: true, message: text} ->
-                    Logger.debug "replying: #{text}"
-                    reply text
-                  _ ->
-                    Logger.debug "no reply"
-                    nil
+                  %{reply: true, response: %{text: text, image: image}} -> reply_embed %{content: text, embed: %{
+                      color: 0x00b6b6,
+                      title: image.referrer,
+                      url: image.source,
+                      description: image.description,
+                      image: %{url: image.url},
+                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
+                  %{reply: true, response: %{text: text}} -> reply text
+                  _ -> nil
                 end
               {:error, reason} -> Logger.error "Receive error: #{reason}"
             end
