@@ -90,19 +90,19 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro reply(struct) do
-    quote do
-      Channel.send_message(var!(state)[:rest_client], var!(msg).data["channel_id"], unquote(struct))
-    end
-  end
-
   defmacro reply(text, chan: channel_id) when is_bitstring(text) do
     quote do
       Channel.send_message(var!(state)[:rest_client], unquote(channel_id), %{content: unquote(text)})
     end
   end
 
-  defmacro reply(struct, chan: channel_id) do
+  defmacro reply_embed(struct) do
+    quote do
+      Channel.send_message(var!(state)[:rest_client], var!(msg).data["channel_id"], unquote(struct))
+    end
+  end
+
+  defmacro reply_embed(struct, chan: channel_id) do
     quote do
       Channel.send_message(var!(state)[:rest_client], unquote(channel_id), unquote(struct))
     end

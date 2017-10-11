@@ -53,7 +53,7 @@ defmodule DiscordKuma.Announce do
                     game -> "playing #{game}"
                   end
 
-                  reply %{content: message, embed: %{
+                  reply_embed %{content: message, embed: %{
                     color: 0x4b367c,
                     title: "#{twitch_username} #{game}",
                     url: "#{stream_url}",
