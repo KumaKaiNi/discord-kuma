@@ -3,22 +3,22 @@ defmodule DiscordKuma.Announce do
   alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   def announce(msg, state) do
-    guild_id = msg.data["guild_id"] |> Integer.to_string
-    user_id = msg.data["user"]["id"]
+    guild_id = msg.data.guild_id |> Integer.to_string
+    user_id = msg.data.user.id
     member = Guild.member(state[:rest_client], guild_id, user_id)
     username = member["user"]["username"]
 
-    if msg.data["game"] do
-      if msg.data["game"]["type"] do
-        case msg.data["game"]["type"] do
+    if msg.data.game. do
+      if msg.data.game.type do
+        case msg.data.game.type do
           0 -> remove_streamer(guild_id, user_id)
           1 ->
             {rate, _} = ExRated.check_rate({guild_id, user_id}, 3_600_000, 1)
 
             case rate do
               :ok ->
-                stream_title = msg.data["game"]["name"]
-                stream_url = msg.data["game"]["url"]
+                stream_title = msg.data.game.name
+                stream_url = msg.data.game.url
                 twitch_username = stream_url |> String.split("/") |> List.last
                 log_chan = query_data("guilds", guild_id).log
 
