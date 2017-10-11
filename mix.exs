@@ -29,7 +29,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:discord_ex, git: "https://github.com/rmcafee/discord_ex.git"},
+    [{:discord_ex, git: "https://github.com/jussih/discord_ex.git", branch: "apiv6"},
      {:ex_rated, "~> 1.2"}]
   end
 end

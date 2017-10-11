@@ -100,8 +100,6 @@ defmodule DiscordKuma.Bot do
           :ok ->
             case :gen_tcp.recv(socket, 0) do
               {:ok, response} ->
-                IO.inspect(response |> Poison.Parser.parse!(keys: :atoms))
-
                 case response |> Poison.Parser.parse!(keys: :atoms) do
                   %{reply: true, response: %{text: text, image: image}} -> reply_embed %{content: text, embed: %{
                       color: 0x00b6b6,
