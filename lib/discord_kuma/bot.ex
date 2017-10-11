@@ -4,15 +4,21 @@ defmodule DiscordKuma.Bot do
   alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   handle :message_create do
+    match "!kuma", do: kuma(msg, state)
     match "!announce here", do: set_log_channel(msg, state)
     match "!announce stop", do: del_log_channel(msg, state)
 
-    match_all, do: make_call(msg, state)
+    match_all do: make_call(msg, state)
   end
 
   handle :presence_update, do: announce(msg, state)
 
   def handle_event({_event, _msg}, state), do: {:ok, state}
+
+  defp kuma(msg, state) do
+    IO.inspect msg
+    reply "Kuma~!"
+  end
 
   defp make_call(msg, state) do
     nil
