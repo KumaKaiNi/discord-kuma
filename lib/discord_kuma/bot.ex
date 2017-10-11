@@ -5,7 +5,7 @@ defmodule DiscordKuma.Bot do
 
   handle :message_create do
     match "!ping" do
-      IO.inspect dm(msg, state)
+      IO.inspect nsfw(msg, state)
       reply "Pong!"
     end
   end
@@ -48,7 +48,7 @@ defmodule DiscordKuma.Bot do
   end
 
   def nsfw(msg) do
-    {:ok, channel} = Nostrum.Api.get_channel(msg.channel_id)
+    channel = Channel.get(state[:rest_client], msg.data["channel_id"])
     channel["nsfw"]
   end
 end
