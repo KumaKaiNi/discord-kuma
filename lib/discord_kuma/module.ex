@@ -88,7 +88,7 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro reply(struct) do
+  defmacro reply(struct) when is_map(struct) do
     quote do
       Channel.send_message(var!(state)[:rest_client], var!(msg).data["channel_id"], unquote(struct))
     end
@@ -100,7 +100,7 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro reply(struct, chan: channel_id) do
+  defmacro reply(struct, chan: channel_id) when is_map(struct) do
     quote do
       Channel.send_message(var!(state)[:rest_client], unquote(channel_id), unquote(struct))
     end
