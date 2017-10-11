@@ -19,7 +19,7 @@ defmodule DiscordKuma.Module do
 
   defmacro enforce(validator, do: body) do
     quote do
-      if unquote(validator)(var!(msg)) do
+      if unquote(validator)(var!(msg), var!(state)) do
         unquote(body)
       end
     end
