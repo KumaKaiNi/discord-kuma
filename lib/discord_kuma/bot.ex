@@ -109,7 +109,7 @@ defmodule DiscordKuma.Bot do
                       url: image.source,
                       description: image.description,
                       image: %{url: image.url},
-                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
+                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}}
                   %{reply: true, response: %{text: text}} -> reply text
                   _ -> nil
                 end
