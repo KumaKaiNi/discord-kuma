@@ -65,7 +65,7 @@ defmodule DiscordKuma.Bot do
                 case response |> Poison.Parser.parse!(keys: :atoms) do
                   %{reply: true, message: text} ->
                     Logger.debug "replying: #{text}"
-                    reply text
+                    reply text, chan: msg.data["channel_id"]
                   _ ->
                     Logger.debug "no reply"
                     nil
