@@ -8,7 +8,7 @@ defmodule DiscordKuma.Announce do
     member = Guild.member(state[:rest_client], guild_id, user_id)
     username = member["user"]["username"]
 
-    if msg.data.game. do
+    if msg.data.game do
       if msg.data.game.type do
         case msg.data.game.type do
           0 -> remove_streamer(guild_id, user_id)
