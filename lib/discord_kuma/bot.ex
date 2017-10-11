@@ -49,6 +49,10 @@ defmodule DiscordKuma.Bot do
 
   def nsfw(msg, state) do
     channel = Channel.get(state[:rest_client], msg.data["channel_id"])
-    channel["nsfw"]
+
+    cond channel["nsfw"] do
+      nil -> true
+      nsfw -> nsfw
+    end
   end
 end
