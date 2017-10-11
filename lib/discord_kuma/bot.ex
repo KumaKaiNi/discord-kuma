@@ -1,10 +1,11 @@
 defmodule DiscordKuma.Bot do
   use DiscordKuma.Module
   import DiscordKuma.{Announce, Util}
+  alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   handle :message_create do
     match "!ping" do
-      IO.inspect msg
+      IO.inspect admin(msg, state)
       reply "Pong!"
     end
   end
@@ -13,19 +14,19 @@ defmodule DiscordKuma.Bot do
 
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
-  def admin(msg) do
+  def admin(msg, state) do
     user_id = msg.data["author"]["id"]
     rekyuu_id = 107977662680571904
 
     cond do
       user_id == rekyuu_id -> true
       true ->
-        guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+        guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
 
         case guild_id do
           nil -> false
           guild_id ->
-            {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
+            member = Guild.member(state[:rest_client], guild_id, user_id)
 
             db = query_data("guilds", guild_id)
 
