@@ -3,7 +3,10 @@ defmodule DiscordKuma.Bot do
   import DiscordKuma.{Announce, Util}
 
   handle :message_create do
-    match "!ping", do: reply "Pong!"
+    match "!ping" do
+      IO.inspect msg
+      reply "Pong!"
+    end
   end
 
   handle :presence_update, do: announce(msg, state)
@@ -11,7 +14,7 @@ defmodule DiscordKuma.Bot do
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
   def admin(msg) do
-    user_id = msg.author.id
+    user_id = msg.data.["author"]["id"]
     rekyuu_id = 107977662680571904
 
     cond do
