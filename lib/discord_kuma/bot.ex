@@ -63,8 +63,12 @@ defmodule DiscordKuma.Bot do
                 IO.inspect(response |> Poison.Parser.parse!(keys: :atoms))
 
                 case response |> Poison.Parser.parse!(keys: :atoms) do
-                  %{reply: true, message: text} -> reply text
-                  _ -> nil
+                  %{reply: true, message: text} ->
+                    Logger.debug "replying: #{text}"
+                    reply text
+                  _ ->
+                    Logger.debug "no reply"
+                    nil
                 end
               {:error, reason} -> Logger.error "Receive error: #{reason}"
             end
