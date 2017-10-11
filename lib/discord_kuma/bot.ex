@@ -14,7 +14,7 @@ defmodule DiscordKuma.Bot do
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
   def admin(msg) do
-    user_id = msg.data.["author"]["id"]
+    user_id = msg.data["author"]["id"]
     rekyuu_id = 107977662680571904
 
     cond do
