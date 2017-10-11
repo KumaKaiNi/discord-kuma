@@ -84,15 +84,15 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro reply(text, chan: channel_id) when is_bitstring(text) do
+  defmacro reply(text) do
     quote do
-      Channel.send_message(var!(state)[:rest_client], unquote(channel_id), %{content: unquote(text)})
+      Channel.send_message(var!(state)[:rest_client], var!(msg).data["channel_id"], %{content: unquote(text)})
     end
   end
 
-  defmacro reply(text) when is_bitstring(text) do
+  defmacro reply(text, chan: channel_id) do
     quote do
-      Channel.send_message(var!(state)[:rest_client], var!(msg).data["channel_id"], %{content: unquote(text)})
+      Channel.send_message(var!(state)[:rest_client], unquote(channel_id), %{content: unquote(text)})
     end
   end
 
