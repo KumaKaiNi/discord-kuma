@@ -45,8 +45,17 @@ defmodule DiscordKuma.Module do
     end
   end
 
-  defmacro match_all(do: body), do: make_match(body)
-  defmacro match_all(body), do: make_match(body)
+  defmacro match_all(do: body) do
+    unless var!(msg).data["author"]["id"] == DiscordEx.RestClient.Resources.User.get(var!(state)[:rest_client]) do
+      make_match(body)
+    end
+  end
+
+  defmacro match_all(body) do
+    unless var!(msg).data["author"]["id"] == DiscordEx.RestClient.Resources.User.get(var!(state)[:rest_client]) do
+      make_match(body)
+    end
+  end
 
   defp make_match(text, body) when is_atom(body) do
     quote do

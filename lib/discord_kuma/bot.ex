@@ -60,6 +60,8 @@ defmodule DiscordKuma.Bot do
           :ok ->
             case :gen_tcp.recv(socket, 0) do
               {:ok, response} ->
+                IO.inspect response
+
                 case response |> Poison.Parser.parse!(keys: :atoms) do
                   %{reply: true, message: text} -> reply text
                   _ -> nil
