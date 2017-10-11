@@ -8,6 +8,9 @@ defmodule DiscordKuma.Bot do
       IO.inspect nsfw(msg, state)
       reply "Pong!"
     end
+
+    match "!announce here", do: set_log_channel(msg, state)
+    match "!announce stop", do: del_log_channel(msg, state)
   end
 
   handle :presence_update, do: announce(msg, state)
