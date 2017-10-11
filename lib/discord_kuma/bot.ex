@@ -13,7 +13,13 @@ defmodule DiscordKuma.Bot do
     match "!announce stop", do: del_log_channel(msg, state)
   end
 
-  handle :presence_update, do: announce(msg, state)
+  handle :presence_update do
+    require Logger
+
+    Logger.debug "presence_update"
+    IO.inspect msg
+    announce(msg, state)
+  end
 
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
