@@ -5,7 +5,7 @@ defmodule DiscordKuma.Bot do
 
   handle :message_create do
     match "!ping" do
-      IO.inspect admin(msg, state)
+      IO.inspect dm(msg, state)
       reply "Pong!"
     end
   end
@@ -42,8 +42,8 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  def dm(msg) do
-    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+  def dm(msg, state) do
+    guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
     guild_id == nil
   end
 
