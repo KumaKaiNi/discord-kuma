@@ -37,11 +37,11 @@ defmodule DiscordKuma.Bot do
       content: %{
         source: %{
           protocol: "discord",
-          guild: %{name: nil, id: nil},
+          guild: %{name: guild["name"], id: guild["id"]},
           channel: %{
-            name: nil,
+            name: channel["name"],
             id: msg.data["channel_id"],
-            private: dm(msg, state),
+            private: private(msg, state),
             nsfw: nsfw(msg, state)}},
         user: %{
           id: msg.data["author"]["id"],
@@ -102,9 +102,8 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  defp dm(msg, state) do
-    guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
-    guild_id == nil
+  defp private(msg, state) do
+    Channel.get(state[:rest_client], msg.data["channel_id"])["is_private"]
   end
 
   defp nsfw(msg, state) do
