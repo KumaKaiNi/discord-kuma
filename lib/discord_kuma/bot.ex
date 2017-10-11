@@ -15,8 +15,10 @@ defmodule DiscordKuma.Bot do
       reply "Kuma~!"
     end
 
-    match "!announce here", do: set_log_channel(msg, state)
-    match "!announce stop", do: del_log_channel(msg, state)
+    enforce :admin do
+      match "!announce here", do: set_log_channel(msg, state)
+      match "!announce stop", do: del_log_channel(msg, state)
+    end
 
     match_all do: make_call(msg, state)
   end
