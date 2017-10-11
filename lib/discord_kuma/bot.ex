@@ -4,7 +4,17 @@ defmodule DiscordKuma.Bot do
   alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   handle :message_create do
-    match "!kuma", do: kuma(msg, state)
+    match "!kuma" do
+      channel = Channel.get(state[:rest_client], msg.data["channel_id"])
+      guild = Guild.get(state[:rest_client], channel["guild_id"])
+
+      IO.inspect msg
+      IO.inspect channel
+      IO.inspect guild
+
+      reply "Kuma~!"
+    end
+
     match "!announce here", do: set_log_channel(msg, state)
     match "!announce stop", do: del_log_channel(msg, state)
 
@@ -15,13 +25,55 @@ defmodule DiscordKuma.Bot do
 
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
-  defp kuma(msg, state) do
-    IO.inspect msg
-    reply "Kuma~!"
-  end
-
   defp make_call(msg, state) do
-    nil
+    channel = Channel.get(state[:rest_client], msg.data["channel_id"])
+    guild = Guild.get(state[:rest_client], channel["guild_id"])
+
+    data = %{
+      auth: Application.get_env(:discord_kuma, :server_auth),
+      type: "message",
+      content: %{
+        source: %{
+          protocol: "discord",
+          guild: %{name: nil, id: nil},
+          channel: %{
+            name: nil,
+            id: msg.data["channel_id"],
+            private: dm(msg, state),
+            nsfw: nsfw(msg, state)}},
+        user: %{
+          id: msg.data["author"]["id"],
+          avatar: msg.data["author"]["avatar"],
+          name: msg.data["author"]["username"],
+          moderator: admin(msg, state)},
+        message: %{
+          text: msg.data["content"],
+          id: msg.data["id"]}}} |> Poison.encode!
+
+    conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
+
+    case conn do
+      {:ok, socket} ->
+        case :gen_tcp.send(socket, data) do
+          :ok ->
+            case :gen_tcp.recv(socket, 0) do
+              {:ok, response} ->
+                case response |> Poison.Parser.parse!(keys: :atoms) do
+                  %{reply: true, message: text} ->
+                    case message.command do
+                      "WHISPER" -> Kaguya.Util.sendPM("/w #{message.user.nick} #{text}", "#jtv")
+                      "PRIVMSG" -> reply text
+                    end
+                  _ -> nil
+                end
+              {:error, reason} -> Logger.error "Receive error: #{reason}"
+            end
+          {:error, reason} -> Logger.error "Send error: #{reason}"
+        end
+
+        :gen_tcp.close(socket)
+      {:error, reason} -> Logger.error "Connection error: #{reason}"
+    end
   end
 
   defp admin(msg, state) do
