@@ -1,11 +1,11 @@
 defmodule DiscordKuma.Announce do
   import DiscordKuma.{Module, Util}
-  alias DiscordEx.RestClient.Resources.Channel
+  alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   def announce(msg, state) do
-    guild_id = msg.guild_id |> Integer.to_string
-    user_id = msg.user.id
-    {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
+    guild_id = msg.data["guild_id"] |> Integer.to_string
+    user_id = msg.data["user"]["id"]
+    member = Guild.member(state[:rest_client], guild_id, user_id)
     username = member["user"]["username"]
 
     if msg.data["game"] do
@@ -16,7 +16,7 @@ defmodule DiscordKuma.Announce do
             {rate, _} = ExRated.check_rate({guild_id, user_id}, 3_600_000, 1)
 
             case rate do
-              :ok    ->
+              :ok ->
                 stream_title = msg.data["game"]["name"]
                 stream_url = msg.data["game"]["url"]
                 twitch_username = stream_url |> String.split("/") |> List.last
@@ -53,14 +53,14 @@ defmodule DiscordKuma.Announce do
                     game -> "playing #{game}"
                   end
 
-                  reply [content: message, embed: %{
+                  reply %{content: message, embed: %{
                     color: 0x4b367c,
                     title: "#{twitch_username} #{game}",
                     url: "#{stream_url}",
                     description: "#{stream_title}",
                     thumbnail: %{url: "#{user.logo}"},
                     timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
-                  }], chan: log_chan
+                  }}, chan: log_chan
                 end
               :error -> nil
             end
@@ -85,7 +85,7 @@ defmodule DiscordKuma.Announce do
   end
 
   def set_log_channel(msg, state) do
-    guild_id = Channel.get(msg.data["channel_id"])["guild_id"]
+    guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
     db = query_data("guilds", guild_id)
 
     db = Map.put(db, :log, msg.data["channel_id"])
@@ -94,7 +94,7 @@ defmodule DiscordKuma.Announce do
   end
 
   def del_log_channel(msg, state) do
-    guild_id = Channel.get(msg.data["channel_id"])["guild_id"]
+    guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
     db = query_data("guilds", guild_id)
 
     db = Map.put(db, :log, nil)
