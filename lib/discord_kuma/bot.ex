@@ -4,26 +4,21 @@ defmodule DiscordKuma.Bot do
   alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   handle :message_create do
-    match "!ping" do
-      IO.inspect nsfw(msg, state)
-      reply "Pong!"
-    end
-
     match "!announce here", do: set_log_channel(msg, state)
     match "!announce stop", do: del_log_channel(msg, state)
+
+    match_all, do: make_call(msg, state)
   end
 
-  handle :presence_update do
-    require Logger
-
-    Logger.debug "presence_update"
-    IO.inspect msg
-    announce(msg, state)
-  end
+  handle :presence_update, do: announce(msg, state)
 
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
-  def admin(msg, state) do
+  defp make_call(msg, state) do
+    nil
+  end
+
+  defp admin(msg, state) do
     user_id = msg.data["author"]["id"]
     rekyuu_id = 107977662680571904
 
@@ -51,12 +46,12 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  def dm(msg, state) do
+  defp dm(msg, state) do
     guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
     guild_id == nil
   end
 
-  def nsfw(msg, state) do
+  defp nsfw(msg, state) do
     channel = Channel.get(state[:rest_client], msg.data["channel_id"])
 
     case channel["nsfw"] do
