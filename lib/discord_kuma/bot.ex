@@ -26,6 +26,8 @@ defmodule DiscordKuma.Bot do
   def handle_event({_event, _msg}, state), do: {:ok, state}
 
   defp make_call(msg, state) do
+    require Logger
+
     channel = Channel.get(state[:rest_client], msg.data["channel_id"])
     guild = Guild.get(state[:rest_client], channel["guild_id"])
 
