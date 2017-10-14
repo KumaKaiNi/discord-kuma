@@ -8,6 +8,7 @@ defmodule DiscordKuma do
     Logger.info "starting supervisor"
 
     children = [worker(DiscordKuma.Bot, [])]
-    Supervisor.start_link(children, strategy: :one_for_one)
+    {:ok, pid} = Supervisor.start_link(children, strategy: :one_for_one)
+    :sys.trace(pid, true)
   end
 end
