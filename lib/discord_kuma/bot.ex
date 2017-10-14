@@ -123,7 +123,7 @@ defmodule DiscordKuma.Bot do
       end
     end
 
-    IO.inspect Process.alive?(tcp_pid), label: "tcp process"
+    if Process.alive?(tcp_pid), do: Process.exit(tcp_pid, :kill)
   end
 
   defp admin(data) do
