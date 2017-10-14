@@ -92,7 +92,7 @@ defmodule DiscordKuma.Bot do
           text: data.content,
           id: data.id}}} |> Poison.encode!
 
-    tcp_pid = spawn fn ->
+    spawn fn ->
       conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
 
       case conn do
@@ -121,9 +121,9 @@ defmodule DiscordKuma.Bot do
           :gen_tcp.close(socket)
         {:error, reason} -> Logger.error "Connection error: #{reason}"
       end
-    end
 
-    if Process.alive?(tcp_pid), do: Process.exit(tcp_pid, :kill)
+      Process.exit(self(), :kill)
+    end
   end
 
   defp admin(data) do
