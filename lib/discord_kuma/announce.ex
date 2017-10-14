@@ -34,7 +34,7 @@ defmodule DiscordKuma.Announce do
                   store_data("streams", guild_id, stream_list ++ [user_id])
 
                   message = case user_id do
-                    107977662680571904 -> "**#{username}** is now live on Twitch! @here"
+                    "107977662680571904" -> "**#{username}** is now live on Twitch! @here"
                     _ -> "**#{username}** is now live on Twitch!"
                   end
 
