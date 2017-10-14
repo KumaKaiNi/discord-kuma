@@ -16,7 +16,9 @@ defmodule DiscordKuma.Bot do
       reply "Kuma~!"
     end
 
-    match "!link", :link_twitch_account
+    enforce :private do
+      match "!link", :link_twitch_account
+    end
 
     enforce :admin do
       match "!announce here", :set_log_channel
@@ -32,7 +34,7 @@ defmodule DiscordKuma.Bot do
 
   defp link_twitch_account(data) do
     case data.content |> String.split |> length do
-      1 -> "Usage: `!link <twitch username>`"
+      1 -> reply "Usage: `!link <twitch username>`"
       _ ->
         [_ | [twitch_account | _]] = data.content |> String.split
         twitch_account = twitch_account |> String.downcase
