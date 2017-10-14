@@ -23,7 +23,7 @@ defmodule DiscordKuma.Bot do
       match "!announce stop", do: reply del_log_channel(data)
     end
 
-    make_call(data)
+    # make_call(data)
   end
 
   handle :presence_update, do: announce(data)
