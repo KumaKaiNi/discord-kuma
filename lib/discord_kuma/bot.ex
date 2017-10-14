@@ -150,7 +150,7 @@ defmodule DiscordKuma.Bot do
   end
 
   defp private(data) do
-    Channel.get(data.channel_id).is_private
+    Channel.get(data.channel_id).guild_id == nil
   end
 
   defp nsfw(data) do
