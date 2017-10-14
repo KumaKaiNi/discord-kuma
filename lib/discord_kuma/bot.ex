@@ -16,11 +16,11 @@ defmodule DiscordKuma.Bot do
       reply "Kuma~!"
     end
 
-    match "!link", do: reply link_twitch_account(data)
+    match "!link", :link_twitch_account
 
     enforce :admin do
-      match "!announce here", do: reply set_log_channel(data)
-      match "!announce stop", do: reply del_log_channel(data)
+      match "!announce here", :set_log_channel
+      match "!announce stop", :del_log_channel
     end
 
     make_call(data)
@@ -44,22 +44,22 @@ defmodule DiscordKuma.Bot do
           nil ->
             cond do
               Enum.member?(all_users, twitch_account) ->
-                "That username has already been taken."
+                reply "That username has already been taken."
               true ->
                 all_users = all_users ++ [twitch_account]
                 store_data(:links, data.author.id, twitch_account)
                 store_data(:links, :users, all_users)
-                "Twitch account linked!"
+                reply "Twitch account linked!"
             end
           user ->
             cond do
               Enum.member?(all_users, twitch_account) ->
-                "That username has already been taken."
+                reply "That username has already been taken."
               true ->
                 all_users = (all_users -- [user]) ++ [twitch_account]
                 store_data(:links, data.author.id, twitch_account)
                 store_data(:links, :users, all_users)
-                "Twitch account updated!"
+                reply "Twitch account updated!"
             end
         end
     end

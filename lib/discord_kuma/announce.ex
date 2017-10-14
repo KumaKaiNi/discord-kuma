@@ -1,5 +1,6 @@
 defmodule DiscordKuma.Announce do
   import DiscordKuma.Util
+  import Din.Module, only: [reply: 2]
   alias Din.Resources.{Channel, Guild}
 
   def announce(data) do
@@ -90,7 +91,7 @@ defmodule DiscordKuma.Announce do
 
     db = Map.put(db, :log, data.channel_id)
     store_data("guilds", guild_id, db)
-    "Okay, I will announce streams here!"
+    reply "Okay, I will announce streams here!"
   end
 
   def del_log_channel(data) do
@@ -99,6 +100,6 @@ defmodule DiscordKuma.Announce do
 
     db = Map.put(db, :log, nil)
     store_data("guilds", guild_id, db)
-    "Okay, I will no longer announce streams."
+    reply "Okay, I will no longer announce streams."
   end
 end
