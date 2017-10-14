@@ -10,7 +10,7 @@ defmodule DiscordKuma.Bot do
       channel = Channel.get(data.channel_id)
       guild = Guild.get(channel.guild_id)
 
-      Logger.debug "from: #{guild.name} \##{channel.name}"
+      Logger.info "from: #{guild.name} \##{channel.name}"
       IO.inspect data
 
       reply "Kuma~!"
