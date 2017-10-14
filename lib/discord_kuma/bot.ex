@@ -92,33 +92,35 @@ defmodule DiscordKuma.Bot do
           text: data.content,
           id: data.id}}} |> Poison.encode!
 
-    conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
+    spawn fn ->
+      conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
 
-    case conn do
-      {:ok, socket} ->
-        case :gen_tcp.send(socket, message) do
-          :ok ->
-            case :gen_tcp.recv(socket, 0) do
-              {:ok, response} ->
-                case response |> Poison.Parser.parse!(keys: :atoms) do
-                  %{reply: true, response: %{text: text, image: image}} ->
-                    reply text, embed: %{
-                      color: 0x00b6b6,
-                      title: image.referrer,
-                      url: image.source,
-                      description: image.description,
-                      image: %{url: image.url},
-                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
-                  %{reply: true, response: %{text: text}} -> reply text
-                  _ -> nil
-                end
-              {:error, reason} -> Logger.error "Receive error: #{reason}"
-            end
-          {:error, reason} -> Logger.error "Send error: #{reason}"
-        end
+      case conn do
+        {:ok, socket} ->
+          case :gen_tcp.send(socket, message) do
+            :ok ->
+              case :gen_tcp.recv(socket, 0) do
+                {:ok, response} ->
+                  case response |> Poison.Parser.parse!(keys: :atoms) do
+                    %{reply: true, response: %{text: text, image: image}} ->
+                      reply text, embed: %{
+                        color: 0x00b6b6,
+                        title: image.referrer,
+                        url: image.source,
+                        description: image.description,
+                        image: %{url: image.url},
+                        timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
+                    %{reply: true, response: %{text: text}} -> reply text
+                    _ -> nil
+                  end
+                {:error, reason} -> Logger.error "Receive error: #{reason}"
+              end
+            {:error, reason} -> Logger.error "Send error: #{reason}"
+          end
 
-        :gen_tcp.close(socket)
-      {:error, reason} -> Logger.error "Connection error: #{reason}"
+          :gen_tcp.close(socket)
+        {:error, reason} -> Logger.error "Connection error: #{reason}"
+      end
     end
   end
 
