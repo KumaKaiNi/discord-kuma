@@ -1,6 +1,6 @@
 defmodule DiscordKuma.Announce do
   import DiscordKuma.Util
-  import Din.Module, only: [reply: 2]
+  import Din.Module, only: [reply: 1]
   alias Din.Resources.{Channel, Guild}
 
   def announce(data) do
