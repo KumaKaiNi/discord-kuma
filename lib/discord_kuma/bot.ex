@@ -71,7 +71,7 @@ defmodule DiscordKuma.Bot do
     channel = Channel.get(data.channel_id)
     guild = Guild.get(channel.guild_id)
 
-    data = %{
+    message = %{
       auth: Application.get_env(:discord_kuma, :server_auth),
       type: "message",
       content: %{
@@ -96,13 +96,13 @@ defmodule DiscordKuma.Bot do
 
     case conn do
       {:ok, socket} ->
-        case :gen_tcp.send(socket, data) do
+        case :gen_tcp.send(socket, message) do
           :ok ->
             case :gen_tcp.recv(socket, 0) do
               {:ok, response} ->
                 case response |> Poison.Parser.parse!(keys: :atoms) do
                   %{reply: true, response: %{text: text, image: image}} ->
-                    Channel.message_create data.channel_id text, embed: [
+                    reply text, embed: [
                       color: 0x00b6b6,
                       title: image.referrer,
                       url: image.source,
