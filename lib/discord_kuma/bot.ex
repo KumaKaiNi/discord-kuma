@@ -102,13 +102,13 @@ defmodule DiscordKuma.Bot do
               {:ok, response} ->
                 case response |> Poison.Parser.parse!(keys: :atoms) do
                   %{reply: true, response: %{text: text, image: image}} ->
-                    reply text, embed: [
+                    reply text, embed: %{
                       color: 0x00b6b6,
                       title: image.referrer,
                       url: image.source,
                       description: image.description,
-                      image: [url: image.url],
-                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"]
+                      image: %{url: image.url},
+                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
                   %{reply: true, response: %{text: text}} -> reply text
                   _ -> nil
                 end
