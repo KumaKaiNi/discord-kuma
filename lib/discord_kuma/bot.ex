@@ -92,7 +92,7 @@ defmodule DiscordKuma.Bot do
           text: data.content,
           id: data.id}}} |> Poison.encode!
 
-    spawn fn ->
+    tcp_pid = spawn fn ->
       conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
 
       case conn do
@@ -123,6 +123,8 @@ defmodule DiscordKuma.Bot do
       end
     end
   end
+
+  IO.inspect Process.alive? tcp_pid, label: "tcp process"
 
   defp admin(data) do
     user_id = data.author.id
