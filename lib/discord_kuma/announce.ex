@@ -13,7 +13,7 @@ defmodule DiscordKuma.Announce do
         case data.game.type do
           0 -> remove_streamer(guild_id, user_id)
           1 ->
-            {rate, _} = ExRated.check_rate({guild_id, user_id}, 3_600_000, 1)
+            {rate, _} = {:ok, "I removed ExRated and this is lazy"}
 
             case rate do
               :ok ->
