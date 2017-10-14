@@ -136,7 +136,7 @@ defmodule DiscordKuma.Bot do
 
   defp admin(data) do
     user_id = data.author.id
-    rekyuu_id = 107977662680571904
+    rekyuu_id = "107977662680571904"
 
     cond do
       user_id == rekyuu_id -> true
