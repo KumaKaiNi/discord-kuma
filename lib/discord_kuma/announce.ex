@@ -53,14 +53,14 @@ defmodule DiscordKuma.Announce do
                     game -> "playing #{game}"
                   end
 
-                  Channel.create_message log_chan, message, embed: [
+                  Channel.create_message log_chan, message, embed: %{
                     color: 0x4b367c,
                     title: "#{twitch_username} #{game}",
                     url: "#{stream_url}",
                     description: "#{stream_title}",
-                    thumbnail: [url: "#{user.logo}"],
+                    thumbnail: %{url: "#{user.logo}"},
                     timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
-                  ], chan: log_chan
+                  }
                 end
               :error -> nil
             end
