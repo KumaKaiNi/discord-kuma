@@ -4,23 +4,23 @@ defmodule DiscordKuma.Bot do
   import DiscordKuma.{Announce, Util}
 
   handle :message_create do
-    match "!kuma" do
-      require Logger
-
-      channel = Channel.get(data.channel_id)
-      guild = Guild.get(channel.guild_id)
-
-      Logger.info "from: #{guild.name} \##{channel.name}"
-      IO.inspect data
-
-      reply "Kuma~!"
-    end
-
     enforce :private do
       match "!link", :link_twitch_account
     end
 
     enforce :admin do
+      match "!kuma" do
+        require Logger
+
+        channel = Channel.get(data.channel_id)
+        guild = Guild.get(channel.guild_id)
+
+        Logger.info "from: #{guild.name} \##{channel.name}"
+        IO.inspect data
+
+        reply "Kuma~!"
+      end
+
       match "!announce here", :set_log_channel
       match "!announce stop", :del_log_channel
     end
@@ -154,8 +154,7 @@ defmodule DiscordKuma.Bot do
               db == nil -> false
               db.admin_roles == [] -> false
               true -> Enum.member?(for role <- member.roles do
-                {role_id, _} = role |> Integer.parse
-                Enum.member?(db.admin_roles, role_id)
+                Enum.member?(db.admin_roles, role)
               end, true)
             end
         end
