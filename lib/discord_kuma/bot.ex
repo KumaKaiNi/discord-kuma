@@ -101,7 +101,8 @@ defmodule DiscordKuma.Bot do
             case :gen_tcp.recv(socket, 0) do
               {:ok, response} ->
                 case response |> Poison.Parser.parse!(keys: :atoms) do
-                  %{reply: true, response: %{text: text, image: image}} -> reply text, embed: [
+                  %{reply: true, response: %{text: text, image: image}} ->
+                    Channel.message_create data.channel_id text, embed: [
                       color: 0x00b6b6,
                       title: image.referrer,
                       url: image.source,
