@@ -3,7 +3,7 @@ defmodule DiscordKuma.Announce do
   alias Din.Resources.{Channel, Guild}
 
   def announce(data) do
-    guild_id = data.guild_id |> Integer.to_string
+    guild_id = data.guild_id
     user_id = data.user.id
     member = Guild.get_member(guild_id, user_id)
     username = member.user.username
