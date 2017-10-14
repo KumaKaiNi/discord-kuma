@@ -118,13 +118,14 @@ defmodule DiscordKuma.Bot do
                       reply text
                     _ -> nil
                   end
-                {:error, reason} -> Logger.error "Receive error: #{reason}"
+                {:error, :timeout} -> Logger.debug "tcp socket timed out"
+                {:error, reason} -> Logger.error "tcp receive error: #{reason}"
               end
-            {:error, reason} -> Logger.error "Send error: #{reason}"
+            {:error, reason} -> Logger.error "tcp send error: #{reason}"
           end
 
           :gen_tcp.close(socket)
-        {:error, reason} -> Logger.error "Connection error: #{reason}"
+        {:error, reason} -> Logger.error "tcp connection error: #{reason}"
       end
 
       Process.exit(self(), :kill)
