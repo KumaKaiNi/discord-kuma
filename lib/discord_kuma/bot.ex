@@ -1,43 +1,43 @@
 defmodule DiscordKuma.Bot do
-  use DiscordKuma.Module
+  use Din.Module
+  alias Din.Resources.{Channel, Guild}
   import DiscordKuma.{Announce, Util}
-  alias DiscordEx.RestClient.Resources.{Channel, Guild}
 
   handle :message_create do
     match "!kuma" do
       require Logger
 
-      channel = Channel.get(state[:rest_client], msg.data["channel_id"])
-      guild = Guild.get(state[:rest_client], channel["guild_id"])
+      channel = Channel.get(data.channel_id)
+      guild = Guild.get(channel.guild_id)
 
-      Logger.debug "from: #{guild["name"]} \##{channel["name"]}"
-      IO.inspect msg
+      Logger.debug "from: #{guild.name} \##{channel.name}"
+      IO.inspect data
 
       reply "Kuma~!"
     end
 
-    match "!link", do: link_twitch_account(msg, state)
+    match "!link", do: reply link_twitch_account(data)
 
     enforce :admin do
-      match "!announce here", do: set_log_channel(msg, state)
-      match "!announce stop", do: del_log_channel(msg, state)
+      match "!announce here", do: reply set_log_channel(data)
+      match "!announce stop", do: reply del_log_channel(data)
     end
 
-    match_all do: make_call(msg, state)
+    make_call(data)
   end
 
-  handle :presence_update, do: announce(msg, state)
+  handle :presence_update, do: announce(data)
 
-  def handle_event({_event, _msg}, state), do: {:ok, state}
+  handle_fallback()
 
-  defp link_twitch_account(msg, state) do
-    case msg.data["content"] |> String.split |> length do
+  defp link_twitch_account(data) do
+    case data.content |> String.split |> length do
       1 -> "Usage: `!link <twitch username>`"
       _ ->
-        [_ | [twitch_account | _]] = msg.data["content"] |> String.split
+        [_ | [twitch_account | _]] = data.content |> String.split
         twitch_account = twitch_account |> String.downcase
 
-        user = query_data(:links, msg.data["author"]["id"])
+        user = query_data(:links, data.author.id)
         all_users = query_data(:links, :users)
 
         case user do
@@ -47,9 +47,9 @@ defmodule DiscordKuma.Bot do
                 "That username has already been taken."
               true ->
                 all_users = all_users ++ [twitch_account]
-                store_data(:links, msg.data["author"]["id"], twitch_account)
+                store_data(:links, data.author.id, twitch_account)
                 store_data(:links, :users, all_users)
-                reply "Twitch account linked!"
+                "Twitch account linked!"
             end
           user ->
             cond do
@@ -57,19 +57,19 @@ defmodule DiscordKuma.Bot do
                 "That username has already been taken."
               true ->
                 all_users = (all_users -- [user]) ++ [twitch_account]
-                store_data(:links, msg.data["author"]["id"], twitch_account)
+                store_data(:links, data.author.id, twitch_account)
                 store_data(:links, :users, all_users)
-                reply "Twitch account updated!"
+                "Twitch account updated!"
             end
         end
     end
   end
 
-  defp make_call(msg, state) do
+  defp make_call(data) do
     require Logger
 
-    channel = Channel.get(state[:rest_client], msg.data["channel_id"])
-    guild = Guild.get(state[:rest_client], channel["guild_id"])
+    channel = Channel.get(data.channel_id)
+    guild = Guild.get(channel.guild_id)
 
     data = %{
       auth: Application.get_env(:discord_kuma, :server_auth),
@@ -77,20 +77,20 @@ defmodule DiscordKuma.Bot do
       content: %{
         source: %{
           protocol: "discord",
-          guild: %{name: guild["name"], id: guild["id"]},
+          guild: %{name: guild.name, id: guild.id},
           channel: %{
-            name: channel["name"],
-            id: msg.data["channel_id"],
-            private: private(msg, state),
-            nsfw: nsfw(msg, state)}},
+            name: channel.name,
+            id: data.channel_id,
+            private: private(data),
+            nsfw: nsfw(data)}},
         user: %{
-          id: msg.data["author"]["id"],
-          avatar: msg.data["author"]["avatar"],
-          name: msg.data["author"]["username"],
-          moderator: admin(msg, state)},
+          id: data.author.id,
+          avatar: data.author.avatar,
+          name: data.author.username,
+          moderator: admin(data)},
         message: %{
-          text: msg.data["content"],
-          id: msg.data["id"]}}} |> Poison.encode!
+          text: data.content,
+          id: data.id}}} |> Poison.encode!
 
     conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
 
@@ -101,13 +101,13 @@ defmodule DiscordKuma.Bot do
             case :gen_tcp.recv(socket, 0) do
               {:ok, response} ->
                 case response |> Poison.Parser.parse!(keys: :atoms) do
-                  %{reply: true, response: %{text: text, image: image}} -> reply_embed %{content: text, embed: %{
+                  %{reply: true, response: %{text: text, image: image}} -> reply text, embed: [
                       color: 0x00b6b6,
                       title: image.referrer,
                       url: image.source,
                       description: image.description,
-                      image: %{url: image.url},
-                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}}
+                      image: [url: image.url],
+                      timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"]
                   %{reply: true, response: %{text: text}} -> reply text
                   _ -> nil
                 end
@@ -121,26 +121,26 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  defp admin(msg, state) do
-    user_id = msg.data["author"]["id"]
+  defp admin(data) do
+    user_id = data.author.id
     rekyuu_id = 107977662680571904
 
     cond do
       user_id == rekyuu_id -> true
       true ->
-        guild_id = Channel.get(state[:rest_client], msg.data["channel_id"])["guild_id"]
+        guild_id = Channel.get(data.channel_id).guild_id
 
         case guild_id do
           nil -> false
           guild_id ->
-            member = Guild.member(state[:rest_client], guild_id, user_id)
+            member = Guild.get_member(guild_id, user_id)
 
             db = query_data("guilds", guild_id)
 
             cond do
               db == nil -> false
               db.admin_roles == [] -> false
-              true -> Enum.member?(for role <- member["roles"] do
+              true -> Enum.member?(for role <- member.roles do
                 {role_id, _} = role |> Integer.parse
                 Enum.member?(db.admin_roles, role_id)
               end, true)
@@ -149,14 +149,14 @@ defmodule DiscordKuma.Bot do
     end
   end
 
-  defp private(msg, state) do
-    Channel.get(state[:rest_client], msg.data["channel_id"])["is_private"]
+  defp private(data) do
+    Channel.get(data.channel_id).is_private
   end
 
-  defp nsfw(msg, state) do
-    channel = Channel.get(state[:rest_client], msg.data["channel_id"])
+  defp nsfw(data) do
+    channel = Channel.get(data.channel_id)
 
-    case channel["nsfw"] do
+    case channel.nsfw do
       nil -> true
       nsfw -> nsfw
     end

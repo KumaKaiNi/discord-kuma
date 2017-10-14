@@ -14,7 +14,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:discord_ex, :ex_rated, :logger, :httpoison],
+    [applications: [:ex_rated, :logger, :httpoison, :din],
      mod: {DiscordKuma, []}
     ]
   end
@@ -29,7 +29,7 @@ defmodule DiscordKuma.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:discord_ex, git: "https://github.com/jussih/discord_ex.git", branch: "apiv6"},
+    [{:din, git: "https://github.com/rekyuu/Din"},
      {:ex_rated, "~> 1.2"}]
   end
 end
