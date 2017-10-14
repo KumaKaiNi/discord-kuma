@@ -103,6 +103,8 @@ defmodule DiscordKuma.Bot do
                 {:ok, response} ->
                   case response |> Poison.Parser.parse!(keys: :atoms) do
                     %{reply: true, response: %{text: text, image: image}} ->
+                      Channel.trigger_typing_indicator data.channel_id
+
                       reply text, embed: %{
                         color: 0x00b6b6,
                         title: image.referrer,
@@ -110,7 +112,10 @@ defmodule DiscordKuma.Bot do
                         description: image.description,
                         image: %{url: image.url},
                         timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
-                    %{reply: true, response: %{text: text}} -> reply text
+                    %{reply: true, response: %{text: text}} ->
+                      Channel.trigger_typing_indicator data.channel_id
+
+                      reply text
                     _ -> nil
                   end
                 {:error, reason} -> Logger.error "Receive error: #{reason}"
