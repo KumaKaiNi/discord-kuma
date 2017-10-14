@@ -123,7 +123,7 @@ defmodule DiscordKuma.Bot do
       end
     end
 
-    IO.inspect Process.alive? tcp_pid, label: "tcp process"
+    IO.inspect Process.alive?(tcp_pid), label: "tcp process"
   end
 
   defp admin(data) do
