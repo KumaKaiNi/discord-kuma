@@ -12,13 +12,7 @@ defmodule DiscordKuma.Bot do
       match "!kuma" do
         require Logger
 
-        channel = Channel.get(data.channel_id)
-
-        {guild, channel_name} = cond do
-          private(data) -> {"private,", data.author.username}
-          true -> {Guild.get(channel.guild_id).name, "\##{channel.name}"}
-        end
-
+        {guild, channel_name} = get_channel_and_guild_names(data)
         Logger.info "from: #{guild} #{channel_name}"
         IO.inspect data
 
@@ -75,7 +69,11 @@ defmodule DiscordKuma.Bot do
     require Logger
 
     channel = Channel.get(data.channel_id)
-    guild = Guild.get(channel.guild_id)
+
+    guild = cond do
+      private(data) -> %{id: nil, name: "private"}
+      true -> Guild.get(channel.guild_id)
+    end
 
     message = %{
       protocol: "discord",
@@ -160,6 +158,15 @@ defmodule DiscordKuma.Bot do
     case channel.nsfw do
       nil -> true
       nsfw -> nsfw
+    end
+  end
+
+  def get_channel_and_guild_names(data) do
+    channel = Channel.get(data.channel_id)
+
+    cond do
+      private(data) -> {"private,", data.author.username}
+      true -> {Guild.get(channel.guild_id).name, "\##{channel.name}"}
     end
   end
 
