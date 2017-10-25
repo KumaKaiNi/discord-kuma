@@ -74,63 +74,48 @@ defmodule DiscordKuma.Bot do
     guild = Guild.get(channel.guild_id)
 
     message = %{
-      auth: Application.get_env(:discord_kuma, :server_auth),
-      type: "message",
-      content: %{
-        source: %{
-          protocol: "discord",
-          guild: %{name: guild.name, id: guild.id},
-          channel: %{
-            name: channel.name,
-            id: data.channel_id,
-            private: private(data),
-            nsfw: nsfw(data)}},
-        user: %{
-          id: data.author.id,
-          avatar: data.author.avatar,
-          name: data.author.username,
-          moderator: admin(data)},
-        message: %{
-          text: data.content,
-          id: data.id}}} |> Poison.encode!
+      protocol: "discord",
+      guild: %{id: guild.id, name: guild.name},
+      channel: %{
+        id: data.channel_id, 
+        name: channel.name, 
+        private: private(data), 
+        nsfw: nsfw(data)
+      },
+      user: %{
+        id: data.author.id,
+        avatar: data.author.avatar,
+        name: data.author.username,
+        moderator: admin(data)
+      },
+      message: %{id: data.id, text: data.content, image: nil}
+    } |> Poison.encode!
 
-    spawn fn ->
-      conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
+    headers = %{
+      "Authorization" => Application.get_env(:discord_kuma, :server_auth),
+      "Content-Type"  => "application/json"
+    }
+    
+    request = 
+      HTTPoison.post!("http://kuma.riichi.me/api", message, headers)
+      |> Map.fetch!(:body)
+      |> parse()
 
-      case conn do
-        {:ok, socket} ->
-          case :gen_tcp.send(socket, message) do
-            :ok ->
-              case :gen_tcp.recv(socket, 0, 5_000) do
-                {:ok, response} ->
-                  case response |> Poison.Parser.parse!(keys: :atoms) do
-                    %{reply: true, response: %{text: text, image: image}} ->
-                      Channel.trigger_typing_indicator data.channel_id
-
-                      reply text, embed: %{
-                        color: 0x00b6b6,
-                        title: image.referrer,
-                        url: image.source,
-                        description: image.description,
-                        image: %{url: image.url},
-                        timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
-                    %{reply: true, response: %{text: text}} ->
-                      Channel.trigger_typing_indicator data.channel_id
-
-                      reply text
-                    _ -> nil
-                  end
-                {:error, :timeout} -> Logger.debug "tcp socket timed out"
-                {:error, reason} -> Logger.error "tcp receive error: #{reason}"
-              end
-            {:error, reason} -> Logger.error "tcp send error: #{reason}"
-          end
-
-          :gen_tcp.close(socket)
-        {:error, reason} -> Logger.error "tcp connection error: #{reason}"
-      end
-
-      Process.exit(self(), :kill)
+    case request do
+      nil  -> nil
+      response_data -> 
+        case response_data.response do
+          %{text: text, image: image} ->
+            reply text, embed: %{
+              color: 0x00b6b6,
+              title: image.referrer,
+              url: image.source,
+              description: image.description,
+              image: %{url: image.url},
+              timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
+          %{text: text} -> reply text
+          response_data -> IO.inspect response_data, label: "unknown response"
+        end
     end
   end
 
@@ -171,6 +156,13 @@ defmodule DiscordKuma.Bot do
     case channel.nsfw do
       nil -> true
       nsfw -> nsfw
+    end
+  end
+
+  def parse(map) do
+    case map do
+      "" -> nil
+      map -> Poison.Parser.parse!(map, keys: :atoms)
     end
   end
 end
