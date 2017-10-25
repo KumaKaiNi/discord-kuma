@@ -19,3 +19,4 @@ erl_crash.dump
 secret.exs
 *.dets
 /_tmp
+mix.lock

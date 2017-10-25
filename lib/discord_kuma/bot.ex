@@ -1,101 +1,176 @@
 defmodule DiscordKuma.Bot do
-  use DiscordKuma.{Module, Commands}
-  import DiscordKuma.Util
+  use Din.Module
+  alias Din.Resources.{Channel, Guild}
+  import DiscordKuma.{Announce, Util}
 
-  handle :MESSAGE_CREATE do
-    match "!help", do: reply "https://github.com/KumaKaiNi/discord-kuma"
-    match "!avatar", :avatar
-    match "!uptime", :uptime
-    match "!time", :local_time
-    match ["!coin", "!flip"], do: reply Enum.random(["Heads.", "Tails."])
-    match ["!pick", "!choose"], :pick
-    match "!roll", :roll
-    match "!predict", :prediction
-    match "!smug", :smug
-    match "!np", :lastfm_np
-    match "!guidance", :souls_message
-    match "!quote", :get_quote
-    match "!safe", :safebooru
-    match "!jackpot", :get_jackpot
-    match "!top5", :get_top_five
-    match "!stats", :get_stats
-    match "!markov", :get_markov
-    match ["ty kuma", "thanks kuma", "thank you kuma"], :ty_kuma
-    match_all :custom_command
-
-    enforce :nsfw do
-      match "!dan", :danbooru
-      match "!ecchi", :ecchibooru
-      match "!lewd", :lewdbooru
-      match ["!nhen", "!nhentai", "!doujin"], :nhentai
-    end
-
-    match ["hello", "hi", "hey", "sup"], :hello
-    match ["same", "Same", "SAME"], :same
-
-    enforce :dm do
+  handle :message_create do
+    enforce :private do
       match "!link", :link_twitch_account
-      match "!coins", :coins
-      match "!level", :level_up
-      match "!slots", :slot_machine
-      match "!lottery", :buy_lottery_ticket
     end
 
     enforce :admin do
-      match "!kuma", :kuma
-      match "!setup", :setup
-      match "!addrole", :add_role
-      match "!delrole", :del_role
-      match "!setlog", :set_log_channel
-      match "!dellog", :del_log_channel
-      match "!add", :add_custom_command
-      match "!del", :del_custom_command
-      match "!addquote", :add_quote
-      match "!delquote", :del_quote
-      match "!draw", :lottery_drawing
-      match "!giftall", :gift_all_coins
+      match "!kuma" do
+        require Logger
+
+        channel = Channel.get(data.channel_id)
+        guild = Guild.get(channel.guild_id)
+
+        Logger.info "from: #{guild.name} \##{channel.name}"
+        IO.inspect data
+
+        reply "Kuma~!"
+      end
+
+      match "!announce here", :set_log_channel
+      match "!announce stop", :del_log_channel
+    end
+
+    make_call(data)
+  end
+
+  handle :presence_update, do: announce(data)
+
+  handle_fallback()
+
+  defp link_twitch_account(data) do
+    case data.content |> String.split |> length do
+      1 -> reply "Usage: `!link <twitch username>`"
+      _ ->
+        [_ | [twitch_account | _]] = data.content |> String.split
+        twitch_account = twitch_account |> String.downcase
+
+        user = query_data(:links, data.author.id)
+        all_users = query_data(:links, :users)
+
+        case user do
+          nil ->
+            cond do
+              Enum.member?(all_users, twitch_account) ->
+                reply "That username has already been taken."
+              true ->
+                all_users = all_users ++ [twitch_account]
+                store_data(:links, data.author.id, twitch_account)
+                store_data(:links, :users, all_users)
+                reply "Twitch account linked!"
+            end
+          user ->
+            cond do
+              Enum.member?(all_users, twitch_account) ->
+                reply "That username has already been taken."
+              true ->
+                all_users = (all_users -- [user]) ++ [twitch_account]
+                store_data(:links, data.author.id, twitch_account)
+                store_data(:links, :users, all_users)
+                reply "Twitch account updated!"
+            end
+        end
     end
   end
 
-  handle :PRESENCE_UPDATE, do: announce(msg)
+  defp make_call(data) do
+    require Logger
 
-  def handle_event(_, state), do: {:ok, state}
+    channel = Channel.get(data.channel_id)
+    guild = Guild.get(channel.guild_id)
 
-  def admin(msg) do
-    user_id = msg.author.id
-    rekyuu_id = 107977662680571904
+    message = %{
+      auth: Application.get_env(:discord_kuma, :server_auth),
+      type: "message",
+      content: %{
+        source: %{
+          protocol: "discord",
+          guild: %{name: guild.name, id: guild.id},
+          channel: %{
+            name: channel.name,
+            id: data.channel_id,
+            private: private(data),
+            nsfw: nsfw(data)}},
+        user: %{
+          id: data.author.id,
+          avatar: data.author.avatar,
+          name: data.author.username,
+          moderator: admin(data)},
+        message: %{
+          text: data.content,
+          id: data.id}}} |> Poison.encode!
+
+    spawn fn ->
+      conn = :gen_tcp.connect({127,0,0,1}, 5862, [:binary, packet: 0, active: false])
+
+      case conn do
+        {:ok, socket} ->
+          case :gen_tcp.send(socket, message) do
+            :ok ->
+              case :gen_tcp.recv(socket, 0, 5_000) do
+                {:ok, response} ->
+                  case response |> Poison.Parser.parse!(keys: :atoms) do
+                    %{reply: true, response: %{text: text, image: image}} ->
+                      Channel.trigger_typing_indicator data.channel_id
+
+                      reply text, embed: %{
+                        color: 0x00b6b6,
+                        title: image.referrer,
+                        url: image.source,
+                        description: image.description,
+                        image: %{url: image.url},
+                        timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"}
+                    %{reply: true, response: %{text: text}} ->
+                      Channel.trigger_typing_indicator data.channel_id
+
+                      reply text
+                    _ -> nil
+                  end
+                {:error, :timeout} -> Logger.debug "tcp socket timed out"
+                {:error, reason} -> Logger.error "tcp receive error: #{reason}"
+              end
+            {:error, reason} -> Logger.error "tcp send error: #{reason}"
+          end
+
+          :gen_tcp.close(socket)
+        {:error, reason} -> Logger.error "tcp connection error: #{reason}"
+      end
+
+      Process.exit(self(), :kill)
+    end
+  end
+
+  defp admin(data) do
+    user_id = data.author.id
+    rekyuu_id = "107977662680571904"
 
     cond do
       user_id == rekyuu_id -> true
       true ->
-        guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+        guild_id = Channel.get(data.channel_id).guild_id
 
         case guild_id do
           nil -> false
           guild_id ->
-            {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
+            member = Guild.get_member(guild_id, user_id)
 
             db = query_data("guilds", guild_id)
 
             cond do
               db == nil -> false
               db.admin_roles == [] -> false
-              true -> Enum.member?(for role <- member["roles"] do
-                {role_id, _} = role |> Integer.parse
-                Enum.member?(db.admin_roles, role_id)
+              true -> Enum.member?(for role <- member.roles do
+                Enum.member?(db.admin_roles, role)
               end, true)
             end
         end
     end
   end
 
-  def dm(msg) do
-    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
-    guild_id == nil
+  defp private(data) do
+    Channel.get(data.channel_id).guild_id == nil
   end
 
-  def nsfw(msg) do
-    {:ok, channel} = Nostrum.Api.get_channel(msg.channel_id)
-    channel["nsfw"]
+  defp nsfw(data) do
+    channel = Channel.get(data.channel_id)
+
+    case channel.nsfw do
+      nil -> true
+      nsfw -> nsfw
+    end
   end
 end

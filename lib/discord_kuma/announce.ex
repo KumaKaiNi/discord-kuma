@@ -1,24 +1,26 @@
-defmodule DiscordKuma.Commands.Announce do
-  import DiscordKuma.{Module, Util}
+defmodule DiscordKuma.Announce do
+  import DiscordKuma.Util
+  import Din.Module, only: [reply: 1]
+  alias Din.Resources.{Channel, Guild}
 
-  def announce(msg) do
-    guild_id = msg.guild_id |> Integer.to_string
-    user_id = msg.user.id
-    {:ok, member} = Nostrum.Api.get_member(guild_id, user_id)
-    username = member["user"]["username"]
+  def announce(data) do
+    guild_id = data.guild_id
+    user_id = data.user.id
+    member = Guild.get_member(guild_id, user_id)
+    username = member.user.username
 
-    if msg.game do
-      if msg.game.type do
-        case msg.game.type do
+    if data.game do
+      if data.game.type do
+        case data.game.type do
           0 -> remove_streamer(guild_id, user_id)
           1 ->
             {rate, _} = ExRated.check_rate({guild_id, user_id}, 3_600_000, 1)
 
             case rate do
-              :ok    ->
-                stream_title = msg.game.name
-                stream_url = msg.game.url
-                twitch_username = msg.game.url |> String.split("/") |> List.last
+              :ok ->
+                stream_title = data.game.name
+                stream_url = data.game.url
+                twitch_username = stream_url |> String.split("/") |> List.last
                 log_chan = query_data("guilds", guild_id).log
 
                 stream_list = query_data("streams", guild_id)
@@ -32,7 +34,7 @@ defmodule DiscordKuma.Commands.Announce do
                   store_data("streams", guild_id, stream_list ++ [user_id])
 
                   message = case user_id do
-                    107977662680571904 -> "**#{username}** is now live on Twitch! @here"
+                    "107977662680571904" -> "**#{username}** is now live on Twitch! @here"
                     _ -> "**#{username}** is now live on Twitch!"
                   end
 
@@ -52,14 +54,14 @@ defmodule DiscordKuma.Commands.Announce do
                     game -> "playing #{game}"
                   end
 
-                  reply [content: message, embed: %Nostrum.Struct.Embed{
+                  Channel.create_message log_chan, message, embed: %{
                     color: 0x4b367c,
                     title: "#{twitch_username} #{game}",
                     url: "#{stream_url}",
                     description: "#{stream_title}",
-                    thumbnail: %Nostrum.Struct.Embed.Thumbnail{url: "#{user.logo}"},
+                    thumbnail: %{url: "#{user.logo}"},
                     timestamp: "#{DateTime.utc_now() |> DateTime.to_iso8601()}"
-                  }], chan: log_chan
+                  }
                 end
               :error -> nil
             end
@@ -67,7 +69,7 @@ defmodule DiscordKuma.Commands.Announce do
       end
     end
 
-    unless msg.game, do: remove_streamer(guild_id, user_id)
+    unless data.game, do: remove_streamer(guild_id, user_id)
   end
 
   defp remove_streamer(guild_id, user_id) do
@@ -83,17 +85,17 @@ defmodule DiscordKuma.Commands.Announce do
     end
   end
 
-  def set_log_channel(msg) do
-    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+  def set_log_channel(data) do
+    guild_id = Channel.get(data.channel_id).guild_id
     db = query_data("guilds", guild_id)
 
-    db = Map.put(db, :log, msg.channel_id)
+    db = Map.put(db, :log, data.channel_id)
     store_data("guilds", guild_id, db)
     reply "Okay, I will announce streams here!"
   end
 
-  def del_log_channel(msg) do
-    guild_id = Nostrum.Api.get_channel!(msg.channel_id)["guild_id"]
+  def del_log_channel(data) do
+    guild_id = Channel.get(data.channel_id).guild_id
     db = query_data("guilds", guild_id)
 
     db = Map.put(db, :log, nil)
