@@ -181,6 +181,7 @@ defmodule DiscordKuma.Bot do
           Poison.Parser.parse!(map, keys: :atoms)
         rescue
           error -> 
+            IO.inspect map, label: "error with response"
             IO.inspect error, label: "error"
             nil
         end
