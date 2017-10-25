@@ -70,9 +70,12 @@ defmodule DiscordKuma.Bot do
 
     channel = Channel.get(data.channel_id)
 
-    guild = cond do
-      private(data) -> %{id: nil, name: "private"}
-      true -> Guild.get(channel.guild_id)
+    {guild, channel} = cond do
+      private(data) -> {
+        %{id: nil, name: "private"}, 
+        %{channel | name: data.author.username}
+      }
+      true -> {Guild.get(channel.guild_id), channel}
     end
 
     message = %{
