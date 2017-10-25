@@ -180,7 +180,9 @@ defmodule DiscordKuma.Bot do
         try do
           Poison.Parser.parse!(map, keys: :atoms)
         rescue
-          error -> Logger.error error
+          error -> 
+            IO.inspect error, label: "error"
+            nil
         end
     end
   end
