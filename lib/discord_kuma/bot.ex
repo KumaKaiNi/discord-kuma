@@ -131,21 +131,25 @@ defmodule DiscordKuma.Bot do
     cond do
       user_id == rekyuu_id -> true
       true ->
-        guild_id = Channel.get(data.channel_id).guild_id
+        cond do
+          private(data) -> false
+          true ->            
+            guild_id = Channel.get(data.channel_id).guild_id
 
-        case guild_id do
-          nil -> false
-          guild_id ->
-            member = Guild.get_member(guild_id, user_id)
+            case guild_id do
+              nil -> false
+              guild_id ->
+                member = Guild.get_member(guild_id, user_id)
 
-            db = query_data("guilds", guild_id)
+                db = query_data("guilds", guild_id)
 
-            cond do
-              db == nil -> false
-              db.admin_roles == [] -> false
-              true -> Enum.member?(for role <- member.roles do
-                Enum.member?(db.admin_roles, role)
-              end, true)
+                cond do
+                  db == nil -> false
+                  db.admin_roles == [] -> false
+                  true -> Enum.member?(for role <- member.roles do
+                    Enum.member?(db.admin_roles, role)
+                  end, true)
+                end
             end
         end
     end
