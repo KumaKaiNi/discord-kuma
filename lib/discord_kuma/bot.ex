@@ -73,7 +73,7 @@ defmodule DiscordKuma.Bot do
     {guild, channel} = cond do
       private(data) -> {
         %{id: nil, name: "private"}, 
-        %{channel | name: data.author.username}
+        Map.put(channel, :name, data.author.username)}
       }
       true -> {Guild.get(channel.guild_id), channel}
     end
