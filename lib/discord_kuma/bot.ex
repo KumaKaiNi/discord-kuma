@@ -158,9 +158,13 @@ defmodule DiscordKuma.Bot do
   defp nsfw(data) do
     channel = Channel.get(data.channel_id)
 
-    case channel.nsfw do
-      nil -> true
-      nsfw -> nsfw
+    cond do
+      private(data) -> true
+      true -> 
+        case channel.nsfw do
+          nil -> true
+          nsfw -> nsfw
+        end
     end
   end
 
