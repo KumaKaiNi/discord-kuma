@@ -176,7 +176,12 @@ defmodule DiscordKuma.Bot do
   def parse(map) do
     case map do
       "" -> nil
-      map -> Poison.Parser.parse!(map, keys: :atoms)
+      map -> 
+        try do
+          Poison.Parser.parse!(map, keys: :atoms)
+        rescue
+          error -> Logger.error error
+        end
     end
   end
 end
