@@ -9,16 +9,6 @@ defmodule DiscordKuma.Bot do
     end
 
     enforce :admin do
-      match "!kuma" do
-        require Logger
-
-        {guild, channel_name} = get_channel_and_guild_names(data)
-        Logger.info "from: #{guild} #{channel_name}"
-        IO.inspect data
-
-        reply "Kuma~!"
-      end
-
       match "!announce here", :set_log_channel
       match "!announce stop", :del_log_channel
     end
