@@ -13,9 +13,13 @@ defmodule DiscordKuma.Bot do
         require Logger
 
         channel = Channel.get(data.channel_id)
-        guild = Guild.get(channel.guild_id)
 
-        Logger.info "from: #{guild.name} \##{channel.name}"
+        guild = cond do
+          private(data) -> "private"
+          true -> Guild.get(channel.guild_id).name
+        end
+
+        Logger.info "from: #{guild} \##{channel.name}"
         IO.inspect data
 
         reply "Kuma~!"
