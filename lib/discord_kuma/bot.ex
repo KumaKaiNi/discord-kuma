@@ -14,12 +14,12 @@ defmodule DiscordKuma.Bot do
 
         channel = Channel.get(data.channel_id)
 
-        guild = cond do
-          private(data) -> "private"
-          true -> Guild.get(channel.guild_id).name
+        {guild, channel_name} = cond do
+          private(data) -> {"private,", data.author.username}
+          true -> {Guild.get(channel.guild_id).name, "\##{channel.name}"}
         end
 
-        Logger.info "from: #{guild} \##{channel.name}"
+        Logger.info "from: #{guild} #{channel_name}"
         IO.inspect data
 
         reply "Kuma~!"
