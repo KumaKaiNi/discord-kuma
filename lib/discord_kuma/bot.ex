@@ -13,7 +13,9 @@ defmodule DiscordKuma.Bot do
       match "!announce stop", :del_log_channel
     end
 
-    make_call(data)
+    unless data.author.username == "KumaKaiNi" do
+      make_call(data)
+    end
   end
 
   handle :presence_update, do: announce(data)
@@ -62,7 +64,7 @@ defmodule DiscordKuma.Bot do
 
     {guild, channel} = cond do
       private(data) -> {
-        %{id: nil, name: "private"}, 
+        %{id: nil, name: nil}, 
         Map.put(channel, :name, data.author.username)
       }
       true -> {Guild.get(channel.guild_id), channel}
