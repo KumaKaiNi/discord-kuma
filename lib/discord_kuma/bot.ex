@@ -147,7 +147,7 @@ defmodule DiscordKuma.Bot do
   end
 
   defp private(data) do
-    Channel.get(data.channel_id).guild_id == nil
+    Map.get(Channel.get(data.channel_id), :guild_id) == nil
   end
 
   defp nsfw(data) do
