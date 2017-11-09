@@ -7,6 +7,8 @@ defmodule DiscordKuma.Bot do
     enforce :private do
       match "!link", :link_twitch_account
     end
+    
+    match "!avatar", :avatar
 
     enforce :admin do
       match "!kuma" do
@@ -65,6 +67,16 @@ defmodule DiscordKuma.Bot do
             end
         end
     end
+  end
+  
+  defp avatar(data) do
+    user = data.mentions |> List.first
+    avatar_url = 
+      "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}?size=1024"
+      
+    reply "", embed: %{
+      color: 0x00b6b6,
+      image: %{url: avatar_url}}
   end
 
   defp make_call(data) do
