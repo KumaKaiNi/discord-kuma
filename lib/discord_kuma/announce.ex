@@ -65,6 +65,7 @@ defmodule DiscordKuma.Announce do
                 end
               :error -> nil
             end
+          _ -> nil
         end
       end
     end
