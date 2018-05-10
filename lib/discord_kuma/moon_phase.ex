@@ -47,6 +47,6 @@ defmodule DiscordKuma.MoonPhase do
   
   def set_server_icon(phase) do
     icon = "./phases/phase#{phase}.jpg"
-    IO.inspect Guild.modify(214268737887404042, icon: "./phases/phase#{phase}.jpg")
+    Guild.modify(214268737887404042, icon: "./phases/phase#{phase}.jpg")
   end
 end
