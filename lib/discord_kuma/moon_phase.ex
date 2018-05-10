@@ -1,8 +1,10 @@
 defmodule DiscordKuma.MoonPhase do
   use GenServer
+  require Logger
   alias Din.Resources.Guild
   
   def start_link(opts \\ []) do
+    Logger.info "Starting moon phases..."
     GenServer.start_link(__MODULE__, :ok, opts)
   end
   
@@ -13,8 +15,10 @@ defmodule DiscordKuma.MoonPhase do
   
   def handle_info(:update, state) do
     phase = moon_phase(Date.utc_today)
+    Logger.info "Current moon phase is #{phase}."
     
     unless phase == state[:phase] do
+      Logger.info "Updating moon phase..."
       set_server_icon(phase)
     end
 
@@ -43,6 +47,6 @@ defmodule DiscordKuma.MoonPhase do
   
   def set_server_icon(phase) do
     icon = File.read!("./phases/phase#{phase}.png")
-    Guild.modify(214268737887404042, icon: icon)
+    IO.inpsect Guild.modify(214268737887404042, icon: icon)
   end
 end
