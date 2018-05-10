@@ -7,7 +7,7 @@ defmodule DiscordKuma do
     import Supervisor.Spec
     Logger.info "starting supervisor"
 
-    children = [worker(DiscordKuma.Bot, [])]
+    children = [worker(DiscordKuma.Bot, []), worker(DiscordKuma.MoonPhase, [])]
     Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
