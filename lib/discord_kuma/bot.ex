@@ -106,7 +106,7 @@ defmodule DiscordKuma.Bot do
     }
     
     request = 
-      HTTPoison.post!("http://kuma.riichi.me/api", message, headers)
+      HTTPoison.post!("http://kuma.riichi.me/api", message, headers, [timeout: 10_000])
       |> Map.fetch!(:body)
       |> parse()
 
