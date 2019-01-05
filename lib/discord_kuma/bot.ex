@@ -1,7 +1,7 @@
 defmodule DiscordKuma.Bot do
   use Din.Module
   alias Din.Resources.{Channel, Guild}
-  import DiscordKuma.{Announce, Util}
+  import DiscordKuma.{Announce, Tourney, Util}
 
   handle :message_create do
     enforce :private do
@@ -9,6 +9,7 @@ defmodule DiscordKuma.Bot do
     end
     
     match "!avatar", :avatar
+    match "!tourney", :tourney
 
     enforce :admin do
       match "!announce here", :set_log_channel
@@ -67,6 +68,28 @@ defmodule DiscordKuma.Bot do
     reply "", embed: %{
       color: 0x00b6b6,
       image: %{url: avatar_url}}
+  end
+
+  defp tourney(data) do
+    [_ | participants_raw] = data.content |> String.split
+
+    case participants_raw do
+      [] -> nil
+      participants_raw ->
+        participants = participants_raw |> Enum.join(" ") |> String.split(", ")
+
+        cond do
+          length(participants) <= 2 -> reply "Just use pick??"
+          true ->
+            :ets.new(:tourney, [:named_table])
+            :ets.insert(:tourney, {"temp", []})
+
+            rounds = Tourney.bracket(participants)
+            script = Tourney.tourney(rounds)
+
+            reply "```\n#{script}\n```"
+        end
+    end
   end
 
   defp make_call(data) do
