@@ -85,7 +85,9 @@ defmodule DiscordKuma.Bot do
             :ets.insert(:tourney, {"temp", []})
 
             rounds = bracket(participants)
-            script = tourney(rounds)
+            tourney(rounds)
+
+            [{_key, script}] = :ets.lookup(:tourney, "temp")
 
             reply "```\n#{script}\n```"
         end
