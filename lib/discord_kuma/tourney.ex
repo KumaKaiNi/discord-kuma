@@ -1,4 +1,4 @@
-defmodule Tourney do
+defmodule DiscordKuma.Tourney do
   def bracket(participants) do
     participants_count = participants |> length
     rounds = (participants_count / 2) |> Float.ceil |> Kernel.trunc
