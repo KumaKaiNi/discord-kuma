@@ -35,7 +35,7 @@ defmodule Tourney do
     [{_key, rounds_script}] = :ets.lookup(:tourney, "temp")
 
     round_number = round_number + 1
-    rounds_script = rounds_script ++ ["-- Round #{round_number} --\n"]
+    rounds_script = rounds_script ++ ["#{if round_number != 1, do: "\n"}-- Round #{round_number} --\n"]
     :ets.insert(:tourney, {"temp", rounds_script})
 
     round_x = compete(rounds)
