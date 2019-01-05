@@ -5,7 +5,7 @@ defmodule DiscordKuma.Tourney do
 
     cond do
       participants_count <= 2 -> participants
-      true -> for chunk <- Enum.chunk_every(participants, rounds) do
+      true -> for chunk <- Enum.chunk(participants, rounds) do
         bracket(chunk)
       end
     end
