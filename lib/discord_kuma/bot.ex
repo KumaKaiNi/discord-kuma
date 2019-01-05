@@ -9,7 +9,7 @@ defmodule DiscordKuma.Bot do
     end
     
     match "!avatar", :avatar
-    match "!tourney", :tourney
+    match "!tourney", :tourney_command
 
     enforce :admin do
       match "!announce here", :set_log_channel
@@ -70,7 +70,7 @@ defmodule DiscordKuma.Bot do
       image: %{url: avatar_url}}
   end
 
-  defp tourney(data) do
+  defp tourney_command(data) do
     [_ | participants_raw] = data.content |> String.split
 
     case participants_raw do
