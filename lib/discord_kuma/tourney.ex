@@ -1,11 +1,11 @@
-defmodule DiscordKuma.Tourney do
+defmodule Tourney do
   def bracket(participants) do
     participants_count = participants |> length
     rounds = (participants_count / 2) |> Float.ceil |> Kernel.trunc
 
     cond do
       participants_count <= 2 -> participants
-      true -> for chunk <- Enum.chunk(participants, rounds) do
+      true -> for chunk <- Enum.chunk_every(participants, rounds) do
         bracket(chunk)
       end
     end

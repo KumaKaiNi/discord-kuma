@@ -76,7 +76,10 @@ defmodule DiscordKuma.Bot do
     case participants_raw do
       [] -> nil
       participants_raw ->
-        participants = participants_raw |> Enum.join(" ") |> String.split(", ")
+        participants = participants_raw 
+          |> Enum.join(" ") 
+          |> String.split(", ")
+          |> Enum.shuffle
 
         cond do
           length(participants) <= 2 -> reply "Just use pick??"
