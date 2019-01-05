@@ -90,6 +90,7 @@ defmodule DiscordKuma.Bot do
             [{_key, script}] = :ets.lookup(:tourney, "temp")
 
             reply "```\n#{script}\n```"
+            :ets.delete(:tourney)
         end
     end
   end
