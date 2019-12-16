@@ -7,7 +7,7 @@ defmodule DiscordKuma.Bot do
     enforce :private do
       match "!link", :link_twitch_account
     end
-    
+
     match "!avatar", :avatar
     match "!tourney", :tourney_command
 
@@ -15,6 +15,8 @@ defmodule DiscordKuma.Bot do
       match "!announce here", :set_log_channel
       match "!announce stop", :del_log_channel
     end
+
+    moderation(data)
 
     unless data.author.username == "KumaKaiNi" do
       make_call(data)
@@ -59,12 +61,12 @@ defmodule DiscordKuma.Bot do
         end
     end
   end
-  
+
   defp avatar(data) do
     user = data.mentions |> List.first
-    avatar_url = 
+    avatar_url =
       "https://cdn.discordapp.com/avatars/#{user.id}/#{user.avatar}?size=1024"
-      
+
     reply "", embed: %{
       color: 0x00b6b6,
       image: %{url: avatar_url}}
@@ -76,8 +78,8 @@ defmodule DiscordKuma.Bot do
     case participants_raw do
       [] -> nil
       participants_raw ->
-        participants = participants_raw 
-          |> Enum.join(" ") 
+        participants = participants_raw
+          |> Enum.join(" ")
           |> String.split(", ")
           |> Enum.shuffle
 
@@ -98,6 +100,17 @@ defmodule DiscordKuma.Bot do
     end
   end
 
+  defp moderation(data) do
+    # Emote layout: <:rekyuuSmile:655187267081601025>
+    blacklist = ["pepe", "pepo", "peepo", "pp", "soft"]
+
+    for word <- blacklist do
+      if String.match?(data.content, Regex.compile!("<:" <> word)) do
+        Channel.delete_message(data.channel_id, data.id)
+      end
+    end
+  end
+
   defp make_call(data) do
     require Logger
 
@@ -105,7 +118,7 @@ defmodule DiscordKuma.Bot do
 
     {guild, channel} = cond do
       private(data) -> {
-        %{id: nil, name: nil}, 
+        %{id: nil, name: nil},
         Map.put(channel, :name, data.author.username)
       }
       true -> {Guild.get(channel.guild_id), channel}
@@ -115,9 +128,9 @@ defmodule DiscordKuma.Bot do
       protocol: "discord",
       guild: %{id: guild.id, name: guild.name},
       channel: %{
-        id: data.channel_id, 
-        name: channel.name, 
-        private: private(data), 
+        id: data.channel_id,
+        name: channel.name,
+        private: private(data),
         nsfw: nsfw(data)
       },
       user: %{
@@ -133,15 +146,15 @@ defmodule DiscordKuma.Bot do
       "Authorization" => Application.get_env(:discord_kuma, :server_auth),
       "Content-Type"  => "application/json"
     }
-    
-    request = 
+
+    request =
       HTTPoison.post!("http://kuma.riichi.me/api", message, headers, [recv_timeout: 10_000])
       |> Map.fetch!(:body)
       |> parse()
 
     case request do
       nil  -> nil
-      response_data -> 
+      response_data ->
         case response_data.response do
           %{text: text, image: image} ->
             reply text, embed: %{
@@ -166,7 +179,7 @@ defmodule DiscordKuma.Bot do
       true ->
         cond do
           private(data) -> false
-          true ->            
+          true ->
             guild_id = Channel.get(data.channel_id).guild_id
 
             case guild_id do
@@ -197,7 +210,7 @@ defmodule DiscordKuma.Bot do
 
     cond do
       private(data) -> true
-      true -> 
+      true ->
         case channel.nsfw do
           nil -> true
           nsfw -> nsfw
@@ -217,11 +230,11 @@ defmodule DiscordKuma.Bot do
   def parse(map) do
     case map do
       "" -> nil
-      map -> 
+      map ->
         try do
           Poison.Parser.parse!(map, keys: :atoms)
         rescue
-          error -> 
+          error ->
             IO.inspect map, label: "error with response"
             IO.inspect error, label: "error"
             nil
