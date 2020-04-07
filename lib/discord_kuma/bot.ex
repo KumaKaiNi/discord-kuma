@@ -4,6 +4,8 @@ defmodule DiscordKuma.Bot do
   import DiscordKuma.{Announce, Tourney, Util}
 
   handle :message_create do
+    [command | _] = data.content |> String.split
+
     enforce :private do
       match "!link", :link_twitch_account
     end
@@ -19,7 +21,7 @@ defmodule DiscordKuma.Bot do
 
     moderation(data)
 
-    unless data.author.username == "KumaKaiNi" do
+    unless data.author.username == "KumaKaiNi" or command == "!markov" do
       make_call(data)
     end
   end
