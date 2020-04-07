@@ -9,6 +9,7 @@ defmodule DiscordKuma.Bot do
     end
 
     match "!avatar", :avatar
+    match "!markov", :markov
     match "!tourney", :tourney_command
 
     enforce :admin do
@@ -70,6 +71,10 @@ defmodule DiscordKuma.Bot do
     reply "", embed: %{
       color: 0x00b6b6,
       image: %{url: avatar_url}}
+  end
+
+  defp markov(data) do
+    Channel.delete_message(data.id)
   end
 
   defp tourney_command(data) do
