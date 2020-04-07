@@ -74,7 +74,7 @@ defmodule DiscordKuma.Bot do
   end
 
   defp markov(data) do
-    Channel.delete_message(data.id)
+    Channel.delete_message(data.channel_id, data.id)
   end
 
   defp tourney_command(data) do
