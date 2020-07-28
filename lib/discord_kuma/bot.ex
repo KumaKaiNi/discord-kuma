@@ -85,8 +85,10 @@ defmodule DiscordKuma.Bot do
     store_data("config", "allow_markov", !allow_markov)
     allow_markov = !allow_markov
 
-    if allow_markov, do: reply "Markov is turned on."
-    else, do: "Markov is turned off."
+    cond do
+      allow_markov -> reply "Markov is turned on."
+      true -> reply "Markov is turned off."
+    end
   end
 
   defp markov(data) do
