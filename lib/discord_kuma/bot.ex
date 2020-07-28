@@ -3,6 +3,9 @@ defmodule DiscordKuma.Bot do
   alias Din.Resources.{Channel, Guild}
   import DiscordKuma.{Announce, Tourney, Util}
 
+  allow_markov = query_data("config", "allow_markov") || false
+  emote_blacklist = query_data("config", "emote_blacklist") || []
+
   handle :message_create do
     [command | _] = data.content |> String.split
 
@@ -15,13 +18,15 @@ defmodule DiscordKuma.Bot do
     match "!tourney", :tourney_command
 
     enforce :admin do
+      match "!blacklist", :add_to_blacklist
+      match "!toggle markov", :toggle_markov
       match "!announce here", :set_log_channel
       match "!announce stop", :del_log_channel
     end
 
     moderation(data)
 
-    unless data.author.username == "KumaKaiNi" or command == "!markov" do
+    unless data.author.username == "KumaKaiNi" or (command == "!markov" and not allow_markov) do
       make_call(data)
     end
   end
@@ -75,8 +80,13 @@ defmodule DiscordKuma.Bot do
       image: %{url: avatar_url}}
   end
 
+  defp toggle_markov(data) do
+    store_data("config", "allow_markov", !allow_markov)
+    allow_markov = !allow_markov
+  end
+
   defp markov(data) do
-    Channel.delete_message(data.channel_id, data.id)
+    if not allow_markov, do: Channel.delete_message(data.channel_id, data.id)
   end
 
   defp tourney_command(data) do
@@ -107,11 +117,15 @@ defmodule DiscordKuma.Bot do
     end
   end
 
+  defp add_to_blacklist(data) do
+    [_ | emotes] = data.content |> String.split
+    store_data("config", "emote_blacklist", emote_blacklist ++ emotes)
+    emote_blacklist = emote_blacklist ++ emotes
+  end
+
   defp moderation(data) do
     # Emote layout: <:rekyuuSmile:655187267081601025>
-    blacklist = ["pepe", "pepo", "peepo", "pp", "soft"]
-
-    for word <- blacklist do
+    for word <- emote_blacklist do
       if String.match?(data.content, Regex.compile!("<:" <> word)) do
         Channel.delete_message(data.channel_id, data.id)
       end
